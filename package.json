@@ -1,0 +1,88 @@
+{
+    "name": "react-keyhub",
+    "version": "0.1.0",
+    "description": "A lightweight, scalable keyboard shortcut manager for React applications with TypeScript support",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "rollup -c",
+        "test": "jest",
+        "lint": "eslint src --ext .ts,.tsx",
+        "typecheck": "tsc --noEmit",
+        "prepublishOnly": "npm run build",
+        "size": "size-limit",
+        "analyze": "size-limit --why",
+        "check-size": "node scripts/check-size.js",
+        "release": "scripts/release.sh",
+        "validate": "npm run typecheck && npm run build && npm run check-size",
+        "install-deps": "npm install --legacy-peer-deps"
+    },
+    "keywords": [
+        "react",
+        "keyboard",
+        "shortcuts",
+        "hotkeys",
+        "keybindings",
+        "typescript"
+    ],
+    "author": "",
+    "license": "MIT",
+    "peerDependencies": {
+        "react": ">=16.8.0",
+        "react-dom": ">=16.8.0"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^22.0.0",
+        "@rollup/plugin-node-resolve": "^13.3.0",
+        "@rollup/plugin-typescript": "^8.3.2",
+        "@size-limit/preset-small-lib": "^8.2.6",
+        "@testing-library/jest-dom": "^5.16.4",
+        "@testing-library/react": "^13.2.0",
+        "@testing-library/react-hooks": "^8.0.0",
+        "@types/jest": "^27.5.1",
+        "@types/react": "^18.0.9",
+        "@types/react-dom": "^18.0.4",
+        "@typescript-eslint/eslint-plugin": "^8.26.0",
+        "@typescript-eslint/parser": "^8.26.0",
+        "eslint": "^8.15.0",
+        "eslint-plugin-react": "^7.30.0",
+        "eslint-plugin-react-hooks": "^4.5.0",
+        "jest": "^28.1.0",
+        "jest-environment-jsdom": "^28.1.0",
+        "react": "^18.1.0",
+        "react-dom": "^18.1.0",
+        "rollup": "^2.74.1",
+        "rollup-plugin-dts": "^4.2.1",
+        "rollup-plugin-peer-deps-external": "^2.2.4",
+        "rollup-plugin-terser": "^7.0.2",
+        "size-limit": "^8.2.6",
+        "ts-jest": "^28.0.2",
+        "tslib": "^2.8.1",
+        "typescript": "^4.6.4"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/alimorshedzadeh/react-keyhub.git"
+    },
+    "bugs": {
+        "url": "https://github.com/alimorshedzadeh/react-keyhub/issues"
+    },
+    "homepage": "https://github.com/alimorshedzadeh/react-keyhub#readme",
+    "directories": {
+        "example": "examples",
+        "test": "tests"
+    },
+    "size-limit": [{
+            "path": "dist/index.js",
+            "limit": "10 KB"
+        },
+        {
+            "path": "dist/index.esm.js",
+            "limit": "10 KB"
+        }
+    ]
+}
