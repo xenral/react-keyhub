@@ -10,7 +10,10 @@ import {
   useShortcutUpdate,
   useShortcutStatus,
   useShortcutGroups,
-  useShortcutPause
+  useShortcutPause,
+  ShortcutRegular,
+  ShortcutScope,
+  ShortcutStatus
 } from '../src';
 import { ShortcutConfig } from '../src/types';
 
@@ -22,11 +25,11 @@ const myShortcuts = {
     keyCombo: 'ctrl+k',
     name: 'Custom Action',
     description: 'Perform a custom action',
-    scope: 'global',
+    scope: 'global' as ShortcutScope,
     priority: 100,
-    status: 'enabled',
+    status: 'enabled' as ShortcutStatus,
     group: 'Custom',
-    type: 'regular'
+    type: 'regular' as const
   }
 };
 
@@ -508,11 +511,11 @@ const EditorSection: React.FC<EditorSectionProps> = ({ theme, layout }) => {
     keyCombo: 'ctrl+d',
     name: 'Dynamic Shortcut',
     description: 'A dynamically registered shortcut',
-    scope: 'local',
+    scope: 'local' as ShortcutScope,
     priority: 100,
-    status: 'enabled',
+    status: 'enabled' as ShortcutStatus,
     group: 'Dynamic',
-    type: 'regular',
+    type: 'regular' as const,
     action: () => {
       showMessage('info', 'Dynamic shortcut triggered!');
     }
@@ -618,11 +621,11 @@ const ShortcutManagerSection: React.FC = () => {
       keyCombo: customShortcutKey,
       name: customShortcutName,
       description: customShortcutDesc,
-      scope: 'global',
+      scope: 'global' as ShortcutScope,
       priority: 100,
-      status: 'enabled',
+      status: 'enabled' as ShortcutStatus,
       group: customShortcutGroup,
-      type: 'regular'
+      type: 'regular' as const
     };
     
     useShortcutRegister(shortcutId, shortcutConfig);
