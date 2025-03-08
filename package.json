@@ -76,8 +76,7 @@
         "example": "examples",
         "test": "tests"
     },
-    "size-limit": [
-        {
+    "size-limit": [{
             "path": "dist/index.js",
             "limit": "10 KB"
         },
