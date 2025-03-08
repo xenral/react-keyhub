@@ -1,6 +1,6 @@
 {
     "name": "react-keyhub",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "A lightweight, scalable keyboard shortcut manager for React applications with TypeScript support",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
@@ -76,7 +76,8 @@
         "example": "examples",
         "test": "tests"
     },
-    "size-limit": [{
+    "size-limit": [
+        {
             "path": "dist/index.js",
             "limit": "10 KB"
         },
