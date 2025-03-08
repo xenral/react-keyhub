@@ -17,6 +17,7 @@ const mockShortcuts: ShortcutSettings = {
     priority: 100,
     status: 'enabled',
     action: jest.fn(),
+    type: 'regular',
   },
   print: {
     keyCombo: 'ctrl+p',
@@ -26,6 +27,7 @@ const mockShortcuts: ShortcutSettings = {
     priority: 100,
     status: 'enabled',
     action: jest.fn(),
+    type: 'regular',
   },
 };
 

@@ -20,6 +20,7 @@ const mockShortcuts: ShortcutSettings = {
     scope: 'global',
     priority: 100,
     status: 'enabled',
+    type: 'regular',
   },
   print: {
     keyCombo: 'ctrl+p',
@@ -28,6 +29,7 @@ const mockShortcuts: ShortcutSettings = {
     scope: 'global',
     priority: 100,
     status: 'enabled',
+    type: 'regular',
   },
 };
 
@@ -65,17 +67,24 @@ describe('KeyHub Hooks', () => {
 
   test('useShortcutStatus should enable and disable shortcuts', () => {
     const { result: eventBusResult } = renderHook(() => useKeyHub(), { wrapper: Wrapper });
-    const { rerender } = renderHook(
-      ({ enabled }) => useShortcutStatus('save', enabled),
-      { 
-        initialProps: { enabled: false },
-        wrapper: Wrapper 
-      }
+    
+    // First render with enabled=false
+    const { unmount } = renderHook(
+      () => useShortcutStatus('save', false),
+      { wrapper: Wrapper }
     );
     
     expect(eventBusResult.current.getShortcuts().save.status).toBe('disabled');
     
-    rerender({ enabled: true });
+    // Unmount the first hook
+    unmount();
+    
+    // Render again with enabled=true
+    renderHook(
+      () => useShortcutStatus('save', true),
+      { wrapper: Wrapper }
+    );
+    
     expect(eventBusResult.current.getShortcuts().save.status).toBe('enabled');
   });
 

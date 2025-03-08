@@ -13,6 +13,7 @@ const mockShortcuts: ShortcutSettings = {
     scope: 'global',
     priority: 100,
     status: 'enabled',
+    type: 'regular',
   },
   print: {
     keyCombo: 'ctrl+p',
@@ -21,6 +22,7 @@ const mockShortcuts: ShortcutSettings = {
     scope: 'global',
     priority: 100,
     status: 'enabled',
+    type: 'regular',
   },
   find: {
     keyCombo: 'ctrl+f',
@@ -29,6 +31,7 @@ const mockShortcuts: ShortcutSettings = {
     scope: 'local',
     priority: 100,
     status: 'enabled',
+    type: 'regular',
   },
 };
 
