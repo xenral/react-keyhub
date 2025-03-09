@@ -4,8 +4,8 @@ A lightweight, scalable keyboard shortcut manager for React applications with Ty
 
 [![npm version](https://img.shields.io/npm/v/react-keyhub.svg)](https://www.npmjs.com/package/react-keyhub)
 [![npm downloads](https://img.shields.io/npm/dm/react-keyhub.svg)](https://www.npmjs.com/package/react-keyhub)
-[![license](https://img.shields.io/npm/l/react-keyhub.svg)](https://github.com/yourusername/react-keyhub/blob/main/LICENSE)
-[![CI](https://github.com/yourusername/react-keyhub/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/react-keyhub/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/react-keyhub.svg)](https://github.com/alimorshedzadeh/react-keyhub/blob/main/LICENSE)
+[![CI](https://github.com/alimorshedzadeh/react-keyhub/actions/workflows/ci.yml/badge.svg)](https://github.com/alimorshedzadeh/react-keyhub/actions/workflows/ci.yml)
 
 ## Features
 
@@ -580,88 +580,6 @@ function MyComponent() {
 }
 ```
 
-## Development
-
-### Installation
-
-```bash
-git clone https://github.com/yourusername/react-keyhub.git
-cd react-keyhub
-npm install
-```
-
-### Running Tests
-
-```bash
-npm test
-```
-
-### Building
-
-```bash
-npm run build
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-### Type Checking
-
-```bash
-npm run typecheck
-```
-
-### Checking Package Size
-
-```bash
-npm run size
-npm run check-size
-```
-
-### Validating the Package
-
-Run all validation steps at once:
-
-```bash
-npm run validate
-```
-
-## Release Process
-
-We use GitHub Actions to automate the release process. To release a new version:
-
-1. Make sure you have set up your git remote:
-   ```bash
-   git remote add origin https://github.com/yourusername/react-keyhub.git
-   ```
-
-2. Make sure all your changes are committed and pushed to the main branch
-
-3. Run the release script with the new version number:
-   ```bash
-   npm run release 1.0.0
-   ```
-   or
-   ```bash
-   ./scripts/release.sh 1.0.0
-   ```
-
-This script will:
-- Check if git remote is properly configured
-- Verify connection to the remote repository
-- Run tests, type checking, and linting
-- Build the package and check its size
-- Update the version in package.json
-- Commit the changes
-- Create a git tag
-- Push the changes and tag to GitHub
-
-4. Go to GitHub and create a new release from the tag
-
-5. The GitHub Actions workflow will automatically publish the package to npm
 
 ## Browser Support
 
