@@ -20,6 +20,13 @@ export {
   useShortcutsByGroup,
 } from './KeyHubContext';
 
+// Export enhanced keyboard shortcut hook
+export {
+  useKeyboardShortcut,
+  AvailableShortcuts,
+  getRegisteredShortcuts,
+} from './useKeyboardShortcut';
+
 export { ShortcutSheet, ShortcutSheetStyles } from './ShortcutSheet';
 
 // Export utilities

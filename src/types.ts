@@ -1,12 +1,18 @@
 /**
  * Represents the scope of a keyboard shortcut
  */
-export type ShortcutScope = 'global' | 'local';
+export enum ShortcutScope {
+  GLOBAL = 'global',
+  LOCAL = 'local'
+}
 
 /**
  * Represents the status of a keyboard shortcut
  */
-export type ShortcutStatus = 'enabled' | 'disabled';
+export enum ShortcutStatus {
+  ENABLED = 'enabled',
+  DISABLED = 'disabled'
+}
 
 /**
  * Represents a context for keyboard shortcuts
@@ -16,7 +22,10 @@ export type ShortcutContext = string;
 /**
  * Represents the type of a keyboard shortcut
  */
-export type ShortcutType = 'regular' | 'sequence';
+export enum ShortcutType {
+  REGULAR = 'regular',
+  SEQUENCE = 'sequence'
+}
 
 /**
  * Base interface for all shortcut configurations
@@ -80,7 +89,7 @@ export interface ShortcutRegular extends ShortcutConfigBase {
   /**
    * The type of shortcut
    */
-  type: 'regular';
+  type: ShortcutType.REGULAR;
 }
 
 /**
@@ -95,7 +104,7 @@ export interface ShortcutSequence extends ShortcutConfigBase {
   /**
    * The type of shortcut
    */
-  type: 'sequence';
+  type: ShortcutType.SEQUENCE;
 }
 
 /**

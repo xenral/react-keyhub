@@ -1,4 +1,4 @@
-import { ShortcutSettings } from './types';
+import { ShortcutSettings, ShortcutScope, ShortcutStatus, ShortcutType } from './types';
 
 /**
  * Default keyboard shortcuts
@@ -9,41 +9,41 @@ export const defaultShortcuts: ShortcutSettings = {
     keyCombo: 'ctrl+s',
     name: 'Save',
     description: 'Save the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'File',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   saveAs: {
     keyCombo: 'ctrl+shift+s',
     name: 'Save As',
     description: 'Save the current document with a new name',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'File',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   print: {
     keyCombo: 'ctrl+p',
     name: 'Print',
     description: 'Print the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'File',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   newWindow: {
     keyCombo: 'ctrl+shift+n',
     name: 'New Window',
     description: 'Open a new window or tab',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'File',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   
   // Edit operations
@@ -51,81 +51,81 @@ export const defaultShortcuts: ShortcutSettings = {
     keyCombo: 'ctrl+f',
     name: 'Find',
     description: 'Find text in the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Edit',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   replace: {
     keyCombo: 'ctrl+h',
     name: 'Replace',
     description: 'Replace text in the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Edit',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   undo: {
     keyCombo: 'ctrl+z',
     name: 'Undo',
     description: 'Undo the last action',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Edit',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   redo: {
     keyCombo: 'ctrl+y',
     name: 'Redo',
     description: 'Redo the last undone action',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Edit',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   cut: {
     keyCombo: 'ctrl+x',
     name: 'Cut',
     description: 'Cut the selected content to the clipboard',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Edit',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   copy: {
     keyCombo: 'ctrl+c',
     name: 'Copy',
     description: 'Copy the selected content to the clipboard',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Edit',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   paste: {
     keyCombo: 'ctrl+v',
     name: 'Paste',
     description: 'Paste content from the clipboard',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Edit',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   selectAll: {
     keyCombo: 'ctrl+a',
     name: 'Select All',
     description: 'Select all content in the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Edit',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   
   // Navigation
@@ -133,22 +133,22 @@ export const defaultShortcuts: ShortcutSettings = {
     keyCombo: 'ctrl+g',
     name: 'Go to Line',
     description: 'Navigate to a specific line',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Navigation',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   goToFile: {
     keyCombo: 'ctrl+p',
     name: 'Go to File',
     description: 'Navigate to a specific file',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 90, // Lower priority than print
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Navigation',
     context: 'editor', // Only active in editor context
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   
   // Help
@@ -156,21 +156,21 @@ export const defaultShortcuts: ShortcutSettings = {
     keyCombo: 'f1',
     name: 'Help',
     description: 'Show help information',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Help',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   showShortcuts: {
     keyCombo: 'ctrl+/',
     name: 'Show Shortcuts',
     description: 'Show all available keyboard shortcuts',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Help',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   
   // Sequence shortcuts
@@ -178,21 +178,21 @@ export const defaultShortcuts: ShortcutSettings = {
     sequence: 'g c',
     name: 'Git Commands',
     description: 'Show git commands menu',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Git',
-    type: 'sequence'
+    type: ShortcutType.SEQUENCE
   },
   gitStatus: {
     sequence: 'g s',
     name: 'Git Status',
     description: 'Show git status',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Git',
-    type: 'sequence'
+    type: ShortcutType.SEQUENCE
   },
   
   // Vim-like navigation (only active in vim context)
@@ -200,44 +200,44 @@ export const defaultShortcuts: ShortcutSettings = {
     keyCombo: 'k',
     name: 'Move Up',
     description: 'Move cursor up',
-    scope: 'local',
+    scope: ShortcutScope.LOCAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Vim Navigation',
     context: 'vim',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   vimDown: {
     keyCombo: 'j',
     name: 'Move Down',
     description: 'Move cursor down',
-    scope: 'local',
+    scope: ShortcutScope.LOCAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Vim Navigation',
     context: 'vim',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   vimLeft: {
     keyCombo: 'h',
     name: 'Move Left',
     description: 'Move cursor left',
-    scope: 'local',
+    scope: ShortcutScope.LOCAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Vim Navigation',
     context: 'vim',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   },
   vimRight: {
     keyCombo: 'l',
     name: 'Move Right',
     description: 'Move cursor right',
-    scope: 'local',
+    scope: ShortcutScope.LOCAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     group: 'Vim Navigation',
     context: 'vim',
-    type: 'regular'
+    type: ShortcutType.REGULAR
   }
 }; 

@@ -3,8 +3,14 @@ import { EventBus } from './EventBus';
 import { ShortcutSettings, KeyHubProviderProps, ShortcutCallback, ShortcutContext, ShortcutConfig } from './types';
 import { defaultShortcuts } from './shortcuts';
 
+// Create a more specific context type that includes the shortcuts
+interface KeyHubContextValue {
+  eventBus: EventBus;
+  shortcuts: ShortcutSettings;
+}
+
 // Create the context
-const KeyHubContext = createContext<EventBus | null>(null);
+const KeyHubContext = createContext<KeyHubContextValue | null>(null);
 
 /**
  * Provider component for the KeyHub context
@@ -17,6 +23,12 @@ export const KeyHubProvider: React.FC<KeyHubProviderProps> = ({
   // Create the event bus instance
   const [eventBus] = useState(() => new EventBus(shortcuts, options));
 
+  // Create the context value with both eventBus and shortcuts
+  const contextValue = {
+    eventBus,
+    shortcuts
+  };
+
   // Clean up the event bus when the component unmounts
   useEffect(() => {
     return () => {
@@ -25,7 +37,7 @@ export const KeyHubProvider: React.FC<KeyHubProviderProps> = ({
   }, [eventBus]);
 
   return (
-    <KeyHubContext.Provider value={eventBus}>
+    <KeyHubContext.Provider value={contextValue}>
       {children}
     </KeyHubContext.Provider>
   );
@@ -36,13 +48,27 @@ export const KeyHubProvider: React.FC<KeyHubProviderProps> = ({
  * @returns The KeyHub event bus instance
  */
 export const useKeyHub = (): EventBus => {
-  const eventBus = useContext(KeyHubContext);
+  const context = useContext(KeyHubContext);
   
-  if (!eventBus) {
+  if (!context) {
     throw new Error('useKeyHub must be used within a KeyHubProvider');
   }
   
-  return eventBus;
+  return context.eventBus;
+};
+
+/**
+ * Hook to access the shortcuts provided to the KeyHub provider
+ * @returns The shortcuts provided to the KeyHub provider
+ */
+export const useKeyHubShortcuts = (): ShortcutSettings => {
+  const context = useContext(KeyHubContext);
+  
+  if (!context) {
+    throw new Error('useKeyHubShortcuts must be used within a KeyHubProvider');
+  }
+  
+  return context.shortcuts;
 };
 
 /**

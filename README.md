@@ -20,6 +20,7 @@ A lightweight, scalable keyboard shortcut manager for React applications with Ty
 - 🔢 **Sequence Support**: Create shortcuts that require a sequence of key presses
 - 🎨 **Theming Support**: Light, dark, and auto themes for the shortcut sheet
 - 📱 **Responsive Layouts**: Modal, sidebar, and inline layouts for the shortcut sheet
+- 💡 **Type Suggestions**: Enhanced hooks with autocomplete for registered shortcuts
 
 ## Installation
 
@@ -35,7 +36,8 @@ yarn add react-keyhub
 import React, { useState } from 'react';
 import { 
   KeyHubProvider, 
-  useShortcut, 
+  useShortcut,
+  useKeyboardShortcut,
   ShortcutSheet,
   defaultShortcuts 
 } from 'react-keyhub';
@@ -57,49 +59,50 @@ const myShortcuts = {
 
 // Your app component
 function App() {
-  return (
-    <KeyHubProvider shortcuts={myShortcuts}>
-      <MyComponent />
-    </KeyHubProvider>
-  );
-}
-
-// A component that uses shortcuts
-function MyComponent() {
-  const [count, setCount] = useState(0);
-  const [isShortcutSheetOpen, setIsShortcutSheetOpen] = useState(false);
+  const [isShortcutSheetOpen, setShortcutSheetOpen] = useState(false);
   
-  // Subscribe to the "save" shortcut
-  useShortcut('save', (e) => {
-    console.log('Save shortcut triggered!');
+  // Use the enhanced hook with type suggestions
+  const isSaveRegistered = useKeyboardShortcut('save', (e) => {
+    console.log('Save triggered!');
     // Your save logic here
   });
   
-  // Subscribe to the "customAction" shortcut
-  useShortcut('customAction', () => {
-    setCount(count + 1);
+  // Use the standard hook
+  useShortcut('customAction', (e) => {
+    console.log('Custom action triggered!');
+    // Your custom action logic here
   });
   
-  // Subscribe to the "showShortcuts" shortcut to toggle the shortcut sheet
+  // Toggle the shortcut sheet
   useShortcut('showShortcuts', () => {
-    setIsShortcutSheetOpen(!isShortcutSheetOpen);
+    setShortcutSheetOpen(prev => !prev);
   });
   
   return (
     <div>
-      <h1>React KeyHub Demo</h1>
-      <p>Count: {count}</p>
-      <p>Press Ctrl+K to increment the count</p>
-      <p>Press Ctrl+/ to show the shortcut sheet</p>
+      <h1>My App</h1>
+      <p>Press Ctrl+/ to see all shortcuts</p>
+      <p>Save shortcut registered: {isSaveRegistered ? 'Yes' : 'No'}</p>
       
-      {/* Render the shortcut sheet */}
+      {/* Shortcut Sheet */}
       <ShortcutSheet 
         isOpen={isShortcutSheetOpen} 
-        onClose={() => setIsShortcutSheetOpen(false)} 
+        onClose={() => setShortcutSheetOpen(false)} 
       />
     </div>
   );
 }
+
+// Wrap your app with the provider
+function Root() {
+  return (
+    <KeyHubProvider shortcuts={myShortcuts}>
+      <App />
+    </KeyHubProvider>
+  );
+}
+
+export default Root;
 ```
 
 ## API Reference
@@ -151,6 +154,119 @@ useShortcut('save', (e) => {
 
 - `shortcutId`: The ID of the shortcut to subscribe to
 - `callback`: The callback to execute when the shortcut is triggered
+
+### `useKeyboardShortcut`
+
+An enhanced hook to subscribe to a keyboard shortcut with type suggestions and better error handling.
+
+```tsx
+// The shortcutId will have type suggestions for all registered shortcuts
+// TypeScript will show an error for non-existent shortcuts
+const isSaveRegistered = useKeyboardShortcut('save', (e) => {
+  console.log('Save shortcut triggered!');
+  // Your save logic here
+});
+
+// The hook returns a boolean indicating if the shortcut is registered
+console.log('Is save shortcut registered?', isSaveRegistered);
+```
+
+#### Parameters
+
+- `shortcutId`: The ID of the shortcut to subscribe to (with type suggestions based on provider shortcuts)
+- `callback`: The callback to execute when the shortcut is triggered
+
+#### Return Value
+
+- `boolean`: Indicates if the shortcut is registered
+
+#### Type Safety
+
+The hook uses the actual shortcuts provided to the KeyHubProvider for type checking:
+
+```tsx
+import { 
+  ShortcutScope, 
+  ShortcutStatus, 
+  ShortcutType, 
+  ShortcutSettings 
+} from 'react-keyhub';
+
+// Define custom shortcuts
+const myShortcuts = {
+  ...defaultShortcuts,
+  customAction: {
+    keyCombo: 'ctrl+shift+c',
+    name: 'Custom Action',
+    description: 'A custom action shortcut',
+    scope: ShortcutScope.GLOBAL,
+    priority: 100,
+    status: ShortcutStatus.ENABLED,
+    group: 'Custom',
+    type: ShortcutType.REGULAR
+  }
+} as ShortcutSettings;
+
+// In your component
+function MyComponent() {
+  // This will work fine
+  useKeyboardShortcut('customAction', () => {});
+  
+  // This will cause a TypeScript error
+  useKeyboardShortcut('nonExistentShortcut', () => {});
+}
+```
+
+#### Error Handling
+
+The hook checks if the shortcut is registered and provides a warning if it's not:
+
+```tsx
+// This will log a warning if 'nonExistentShortcut' is not registered
+useKeyboardShortcut('nonExistentShortcut', (e) => {});
+// Warning: Shortcut "nonExistentShortcut" is not registered. Available shortcuts: save, saveAs, print, ...
+```
+
+### `AvailableShortcuts`
+
+A type that provides suggestions for all registered shortcuts based on what's provided to the KeyHubProvider:
+
+```tsx
+import { AvailableShortcuts } from 'react-keyhub';
+
+// This will have type suggestions for all registered shortcuts
+// based on what's provided to the KeyHubProvider
+const shortcutId: AvailableShortcuts = 'save';
+
+// If you've added a custom shortcut, it will be included in the suggestions
+const customShortcutId: AvailableShortcuts = 'customAction'; // Works if customAction is registered
+```
+
+### `getRegisteredShortcuts`
+
+A function to get all registered shortcuts from the current provider:
+
+```tsx
+import { getRegisteredShortcuts } from 'react-keyhub';
+
+function MyComponent() {
+  // This will return the shortcuts from the current provider
+  const shortcuts = getRegisteredShortcuts();
+  
+  return (
+    <div>
+      <h2>Registered Shortcuts</h2>
+      <ul>
+        {Object.entries(shortcuts).map(([id, config]) => (
+          <li key={id}>
+            {id}: {config.name} - {config.type === 'regular' ? config.keyCombo : config.sequence}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
 
 ### `useShortcutSheet`
 
