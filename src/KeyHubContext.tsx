@@ -86,7 +86,7 @@ export const useShortcut = <T extends keyof ShortcutSettings>(
     if (!callback) return;
     
     const subscriptionId = eventBus.on(shortcutId as string, callback);
-    
+    console.log('subscriptionId', subscriptionId);
     return () => {
       if (subscriptionId) {
         eventBus.off(subscriptionId);

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useKeyHub, useKeyHubShortcuts } from './KeyHubContext';
 import { ShortcutCallback, ShortcutSettings } from './types';
 
@@ -31,6 +31,9 @@ export function useShortcut<T extends AvailableShortcuts>(
   const shortcuts = useKeyHubShortcuts();
   const subscriptionIdRef = useRef<string | null>(null);
   const isRegisteredRef = useRef<boolean>(false);
+  
+  // Stabilize the callback to prevent unnecessary re-registrations
+  const stableCallback = useCallback(callback, [callback]);
 
   useEffect(() => {
     try {
@@ -42,8 +45,16 @@ export function useShortcut<T extends AvailableShortcuts>(
         return;
       }
 
+      // Get the shortcut configuration
+      const shortcut = shortcuts[shortcutId];
+      const normalizedKeyCombo = shortcut.type === 'sequence' 
+        ? shortcutId as string 
+        : normalizeKeyCombo(shortcut.keyCombo);
+      
+      console.log(`Registering shortcut "${String(shortcutId)}" with key combo "${normalizedKeyCombo}"`);
+      
       // Register the callback - this is the critical part
-      const id = eventBus.on(shortcutId as string, callback);
+      const id = eventBus.on(shortcutId as string, stableCallback);
       subscriptionIdRef.current = id;
       
       // Log for debugging
@@ -61,7 +72,7 @@ export function useShortcut<T extends AvailableShortcuts>(
       console.error('Error in useShortcut:', error);
       return undefined;
     }
-  }, [eventBus, shortcutId, callback, shortcuts]);
+  }, [eventBus, shortcutId, stableCallback, shortcuts]);
 
   return isRegisteredRef.current;
 }
@@ -78,4 +89,9 @@ export function getRegisteredShortcuts(): ShortcutSettings {
     console.warn('Unable to get registered shortcuts:', error);
     return {};
   }
+}
+
+// Helper function to normalize key combos (imported from utils)
+function normalizeKeyCombo(keyCombo: string): string {
+  return keyCombo.toLowerCase().split('+').sort().join('+');
 } 
