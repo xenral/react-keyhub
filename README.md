@@ -62,13 +62,13 @@ function App() {
   const [isShortcutSheetOpen, setShortcutSheetOpen] = useState(false);
   
   // Use the enhanced hook with type suggestions
-  const isSaveRegistered = useKeyboardShortcut('save', (e) => {
+  const isSaveRegistered = useShortcut('save', (e) => {
     console.log('Save triggered!');
     // Your save logic here
   });
   
-  // Use the standard hook
-  useShortcut('customAction', (e) => {
+  // You can also use the backward compatibility hooks
+  useKeyboardShortcut('customAction', (e) => {
     console.log('Custom action triggered!');
     // Your custom action logic here
   });
@@ -141,28 +141,12 @@ The provider component that makes shortcuts available throughout your applicatio
 
 ### `useShortcut`
 
-A hook to subscribe to a keyboard shortcut.
-
-```tsx
-useShortcut('save', (e) => {
-  console.log('Save shortcut triggered!');
-  // Your save logic here
-});
-```
-
-#### Parameters
-
-- `shortcutId`: The ID of the shortcut to subscribe to
-- `callback`: The callback to execute when the shortcut is triggered
-
-### `useKeyboardShortcut`
-
-An enhanced hook to subscribe to a keyboard shortcut with type suggestions and better error handling.
+A hook to subscribe to a keyboard shortcut with type suggestions.
 
 ```tsx
 // The shortcutId will have type suggestions for all registered shortcuts
 // TypeScript will show an error for non-existent shortcuts
-const isSaveRegistered = useKeyboardShortcut('save', (e) => {
+const isSaveRegistered = useShortcut('save', (e) => {
   console.log('Save shortcut triggered!');
   // Your save logic here
 });
@@ -210,10 +194,10 @@ const myShortcuts = {
 // In your component
 function MyComponent() {
   // This will work fine
-  useKeyboardShortcut('customAction', () => {});
+  useShortcut('customAction', () => {});
   
   // This will cause a TypeScript error
-  useKeyboardShortcut('nonExistentShortcut', () => {});
+  useShortcut('nonExistentShortcut', () => {});
 }
 ```
 
@@ -223,8 +207,19 @@ The hook checks if the shortcut is registered and provides a warning if it's not
 
 ```tsx
 // This will log a warning if 'nonExistentShortcut' is not registered
-useKeyboardShortcut('nonExistentShortcut', (e) => {});
+useShortcut('nonExistentShortcut', (e) => {});
 // Warning: Shortcut "nonExistentShortcut" is not registered. Available shortcuts: save, saveAs, print, ...
+```
+
+### `useKeyboardShortcut` and `useKey`
+
+For backward compatibility, `useKeyboardShortcut` and `useKey` are also available as aliases for `useShortcut`:
+
+```tsx
+// These are all equivalent
+useShortcut('save', callback);
+useKeyboardShortcut('save', callback);
+useKey('save', callback);
 ```
 
 ### `AvailableShortcuts`

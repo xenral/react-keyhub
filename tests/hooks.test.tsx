@@ -9,7 +9,8 @@ import {
   useShortcutStatus,
   useShortcutUpdate
 } from '../src/KeyHubContext';
-import { ShortcutSettings } from '../src/types';
+import { useShortcut as useShortcutHook } from '../src/useShortcut';
+import { ShortcutSettings, ShortcutScope, ShortcutStatus, ShortcutType } from '../src/types';
 
 // Mock shortcuts for testing
 const mockShortcuts: ShortcutSettings = {
@@ -17,19 +18,19 @@ const mockShortcuts: ShortcutSettings = {
     keyCombo: 'ctrl+s',
     name: 'Save',
     description: 'Save the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
-    type: 'regular',
+    status: ShortcutStatus.ENABLED,
+    type: ShortcutType.REGULAR,
   },
   print: {
     keyCombo: 'ctrl+p',
     name: 'Print',
     description: 'Print the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
-    type: 'regular',
+    status: ShortcutStatus.ENABLED,
+    type: ShortcutType.REGULAR,
   },
 };
 
@@ -53,7 +54,7 @@ describe('KeyHub Hooks', () => {
 
   test('useShortcut should subscribe to a shortcut', () => {
     const callback = jest.fn();
-    const { unmount } = renderHook(() => useShortcut('save', callback), { wrapper: Wrapper });
+    const { unmount } = renderHook(() => useShortcutHook('save', callback), { wrapper: Wrapper });
     
     // No direct way to test the subscription, but we can verify it doesn't throw
     expect(callback).not.toHaveBeenCalled();
@@ -74,7 +75,7 @@ describe('KeyHub Hooks', () => {
       { wrapper: Wrapper }
     );
     
-    expect(eventBusResult.current.getShortcuts().save.status).toBe('disabled');
+    expect(eventBusResult.current.getShortcuts().save.status).toBe(ShortcutStatus.DISABLED);
     
     // Unmount the first hook
     unmount();
@@ -85,7 +86,7 @@ describe('KeyHub Hooks', () => {
       { wrapper: Wrapper }
     );
     
-    expect(eventBusResult.current.getShortcuts().save.status).toBe('enabled');
+    expect(eventBusResult.current.getShortcuts().save.status).toBe(ShortcutStatus.ENABLED);
   });
 
   test('useShortcutUpdate should update shortcut configuration', () => {

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ShortcutSheet } from '../src/ShortcutSheet';
 import { KeyHubProvider } from '../src/KeyHubContext';
-import { ShortcutSettings } from '../src/types';
+import { ShortcutSettings, ShortcutScope, ShortcutStatus, ShortcutType } from '../src/types';
 
 // Mock shortcuts for testing
 const mockShortcuts: ShortcutSettings = {
@@ -10,28 +10,28 @@ const mockShortcuts: ShortcutSettings = {
     keyCombo: 'ctrl+s',
     name: 'Save',
     description: 'Save the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
-    type: 'regular',
+    status: ShortcutStatus.ENABLED,
+    type: ShortcutType.REGULAR,
   },
   print: {
     keyCombo: 'ctrl+p',
     name: 'Print',
     description: 'Print the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
-    type: 'regular',
+    status: ShortcutStatus.ENABLED,
+    type: ShortcutType.REGULAR,
   },
   find: {
     keyCombo: 'ctrl+f',
     name: 'Find',
     description: 'Find text in the current document',
-    scope: 'local',
+    scope: ShortcutScope.LOCAL,
     priority: 100,
-    status: 'enabled',
-    type: 'regular',
+    status: ShortcutStatus.ENABLED,
+    type: ShortcutType.REGULAR,
   },
 };
 

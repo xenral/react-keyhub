@@ -395,7 +395,7 @@ export class EventBus {
    * @param shortcutId The ID of the shortcut to enable
    */
   public enableShortcut(shortcutId: string): void {
-    this.updateShortcut(shortcutId, { status: 'enabled' });
+    this.updateShortcut(shortcutId, { status: ShortcutStatus.ENABLED });
   }
 
   /**
@@ -403,7 +403,7 @@ export class EventBus {
    * @param shortcutId The ID of the shortcut to disable
    */
   public disableShortcut(shortcutId: string): void {
-    this.updateShortcut(shortcutId, { status: 'disabled' });
+    this.updateShortcut(shortcutId, { status: ShortcutStatus.DISABLED });
   }
 
   /**

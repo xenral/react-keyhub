@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   KeyHubProvider, 
-  useKey,
+  useShortcut,
   defaultShortcuts,
   AvailableShortcuts,
   getRegisteredShortcuts,
@@ -18,14 +18,14 @@ const ShortcutDemo: React.FC = () => {
   
   // The shortcutId will have type suggestions for all registered shortcuts
   // TypeScript will now show an error for non-existent shortcuts
-  const isSaveRegistered = useKey('save', (e) => {
+  const isSaveRegistered = useShortcut('save', (e) => {
     e.preventDefault();
     setLastTriggered('save');
     console.log('Save shortcut triggered!');
   });
 
   // Another example with a different shortcut
-  const isUndoRegistered = useKey('undo', (e) => {
+  const isUndoRegistered = useShortcut('undo', (e) => {
     e.preventDefault();
     setLastTriggered('undo');
     setCount(prev => Math.max(0, prev - 1));
@@ -33,7 +33,7 @@ const ShortcutDemo: React.FC = () => {
   });
 
   // Example with a sequence shortcut
-  const isGitCommandsRegistered = useKey('gitCommands', (e) => {
+  const isGitCommandsRegistered = useShortcut('gitCommands', (e) => {
     e.preventDefault();
     setLastTriggered('gitCommands');
     console.log('Git Commands shortcut triggered!');
@@ -56,7 +56,7 @@ const ShortcutDemo: React.FC = () => {
 
   // Example of type checking - this would cause a TypeScript error
   // Uncomment to see the error:
-  // const invalidShortcut = useKey('nonExistentShortcut', () => {});
+  // const invalidShortcut = useShortcut('nonExistentShortcut', () => {});
 
   return (
     <div style={{ padding: '20px' }}>

@@ -1,5 +1,5 @@
 import { EventBus } from '../src/EventBus';
-import { ShortcutSettings } from '../src/types';
+import { ShortcutSettings, ShortcutScope, ShortcutStatus, ShortcutType } from '../src/types';
 
 // Mock document for testing
 const mockDocument = {
@@ -13,21 +13,21 @@ const mockShortcuts: ShortcutSettings = {
     keyCombo: 'ctrl+s',
     name: 'Save',
     description: 'Save the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     action: jest.fn(),
-    type: 'regular',
+    type: ShortcutType.REGULAR,
   },
   print: {
     keyCombo: 'ctrl+p',
     name: 'Print',
     description: 'Print the current document',
-    scope: 'global',
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled',
+    status: ShortcutStatus.ENABLED,
     action: jest.fn(),
-    type: 'regular',
+    type: ShortcutType.REGULAR,
   },
 };
 
@@ -62,11 +62,11 @@ describe('EventBus', () => {
   test('should enable and disable shortcuts', () => {
     eventBus.disableShortcut('save');
     let shortcuts = eventBus.getShortcuts();
-    expect(shortcuts.save.status).toBe('disabled');
+    expect(shortcuts.save.status).toBe(ShortcutStatus.DISABLED);
 
     eventBus.enableShortcut('save');
     shortcuts = eventBus.getShortcuts();
-    expect(shortcuts.save.status).toBe('enabled');
+    expect(shortcuts.save.status).toBe(ShortcutStatus.ENABLED);
   });
 
   test('should subscribe to shortcuts and return subscription ID', () => {

@@ -21,13 +21,14 @@ export {
 
 // Export enhanced keyboard shortcut hook
 export {
-  useKey,
+  useShortcut,
   AvailableShortcuts,
   getRegisteredShortcuts,
-} from './useKey';
+} from './useShortcut';
 
-// For backward compatibility (deprecated)
-export { useKey as useKeyboardShortcut } from './useKey';
+// For backward compatibility
+export { useShortcut as useKeyboardShortcut } from './useShortcut';
+export { useShortcut as useKey } from './useShortcut';
 
 export { ShortcutSheet, ShortcutSheetStyles } from './ShortcutSheet';
 

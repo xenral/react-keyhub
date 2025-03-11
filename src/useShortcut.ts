@@ -19,11 +19,11 @@ export type AvailableShortcuts = keyof ProviderShortcuts;
  * @returns A boolean indicating if the shortcut is registered
  * @example
  * // Will suggest all registered shortcuts like 'save', 'undo', etc.
- * const isSaveRegistered = useKey('save', (e) => {
+ * const isSaveRegistered = useShortcut('save', (e) => {
  *   console.log('Save triggered!');
  * });
  */
-export function useKey<T extends AvailableShortcuts>(
+export function useShortcut<T extends AvailableShortcuts>(
   shortcutId: T,
   callback: ShortcutCallback
 ): boolean {
@@ -53,7 +53,7 @@ export function useKey<T extends AvailableShortcuts>(
         }
       };
     } catch (error) {
-      console.error('Error in useKey:', error);
+      console.error('Error in useShortcut:', error);
       return undefined;
     }
   }, [eventBus, shortcutId, callback, shortcuts]);
