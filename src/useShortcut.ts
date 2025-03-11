@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { useKeyHub, useKeyHubShortcuts } from './KeyHubContext';
 import { ShortcutCallback, ShortcutSettings } from './types';
 
@@ -32,9 +32,15 @@ export function useShortcut<T extends AvailableShortcuts>(
   const subscriptionIdRef = useRef<string | null>(null);
   const isRegisteredRef = useRef<boolean>(false);
   
-  // Stabilize the callback to prevent unnecessary re-registrations
-  const stableCallback = useCallback(callback, [callback]);
+  // Store the callback in a ref to avoid dependency issues
+  const callbackRef = useRef(callback);
+  
+  // Update the callback ref when it changes
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
 
+  // This effect handles the subscription and only runs when shortcutId or eventBus changes
   useEffect(() => {
     try {
       // Check if the shortcut exists in the registered shortcuts
@@ -52,6 +58,11 @@ export function useShortcut<T extends AvailableShortcuts>(
         : normalizeKeyCombo(shortcut.keyCombo);
       
       console.log(`Registering shortcut "${String(shortcutId)}" with key combo "${normalizedKeyCombo}"`);
+      
+      // Create a stable wrapper function that calls the current callback from the ref
+      const stableCallback: ShortcutCallback = (event) => {
+        callbackRef.current(event);
+      };
       
       // Register the callback - this is the critical part
       const id = eventBus.on(shortcutId as string, stableCallback);
@@ -72,7 +83,7 @@ export function useShortcut<T extends AvailableShortcuts>(
       console.error('Error in useShortcut:', error);
       return undefined;
     }
-  }, [eventBus, shortcutId, stableCallback, shortcuts]);
+  }, [eventBus, shortcutId, shortcuts]); // Removed callback from dependencies
 
   return isRegisteredRef.current;
 }
