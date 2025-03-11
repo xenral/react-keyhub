@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { 
   KeyHubProvider, 
-  useKeyboardShortcut, 
+  useKey,
   defaultShortcuts, 
   ShortcutScope,
   ShortcutStatus,
@@ -45,17 +45,17 @@ const TestComponent = () => {
   const [lastTriggered, setLastTriggered] = React.useState<string | null>(null);
   
   // Register a valid shortcut
-  const isSaveRegistered = useKeyboardShortcut('save', (e) => {
+  const isSaveRegistered = useKey('save', (e) => {
     setLastTriggered('save');
   });
   
   // Register a custom shortcut
-  const isCustomRegistered = useKeyboardShortcut('customAction', (e) => {
+  const isCustomRegistered = useKey('customAction', (e) => {
     setLastTriggered('customAction');
   });
   
   // Register a non-existent shortcut (using type assertion to bypass TypeScript)
-  const isNonExistentRegistered = useKeyboardShortcut('nonExistentShortcut' as any, (e) => {
+  const isNonExistentRegistered = useKey('nonExistentShortcut' as any, (e) => {
     setLastTriggered('nonExistentShortcut');
   });
   
@@ -69,7 +69,7 @@ const TestComponent = () => {
   );
 };
 
-describe('useKeyboardShortcut', () => {
+describe('useKey', () => {
   test('should register valid shortcuts', () => {
     render(
       <KeyHubProvider shortcuts={customShortcuts}>

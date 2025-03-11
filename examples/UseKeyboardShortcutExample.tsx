@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   KeyHubProvider, 
-  useKeyboardShortcut, 
+  useKey,
   defaultShortcuts,
   AvailableShortcuts,
   getRegisteredShortcuts,
@@ -18,14 +18,14 @@ const ShortcutDemo: React.FC = () => {
   
   // The shortcutId will have type suggestions for all registered shortcuts
   // TypeScript will now show an error for non-existent shortcuts
-  const isSaveRegistered = useKeyboardShortcut('save', (e) => {
+  const isSaveRegistered = useKey('save', (e) => {
     e.preventDefault();
     setLastTriggered('save');
     console.log('Save shortcut triggered!');
   });
 
   // Another example with a different shortcut
-  const isUndoRegistered = useKeyboardShortcut('undo', (e) => {
+  const isUndoRegistered = useKey('undo', (e) => {
     e.preventDefault();
     setLastTriggered('undo');
     setCount(prev => Math.max(0, prev - 1));
@@ -33,7 +33,7 @@ const ShortcutDemo: React.FC = () => {
   });
 
   // Example with a sequence shortcut
-  const isGitCommandsRegistered = useKeyboardShortcut('gitCommands', (e) => {
+  const isGitCommandsRegistered = useKey('gitCommands', (e) => {
     e.preventDefault();
     setLastTriggered('gitCommands');
     console.log('Git Commands shortcut triggered!');
@@ -47,15 +47,16 @@ const ShortcutDemo: React.FC = () => {
   // Get all registered shortcuts for display
   const shortcuts = getRegisteredShortcuts();
   const shortcutList = Object.entries(shortcuts).map(([id, config]) => {
-    const combo = config.type === ShortcutType.REGULAR 
-      ? (config as any).keyCombo 
-      : (config as any).sequence;
-    return { id, name: config.name, combo };
+    const shortcutConfig = config as ShortcutSettings[keyof ShortcutSettings];
+    const combo = shortcutConfig.type === ShortcutType.REGULAR 
+      ? 'keyCombo' in shortcutConfig ? shortcutConfig.keyCombo : ''
+      : 'sequence' in shortcutConfig ? shortcutConfig.sequence : '';
+    return { id, name: shortcutConfig.name, combo };
   });
 
   // Example of type checking - this would cause a TypeScript error
   // Uncomment to see the error:
-  // const invalidShortcut = useKeyboardShortcut('nonExistentShortcut', () => {});
+  // const invalidShortcut = useKey('nonExistentShortcut', () => {});
 
   return (
     <div style={{ padding: '20px' }}>

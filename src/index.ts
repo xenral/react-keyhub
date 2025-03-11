@@ -9,7 +9,6 @@ export { defaultShortcuts } from './shortcuts';
 export {
   KeyHubProvider,
   useKeyHub,
-  useShortcut,
   useShortcutSheet,
   useShortcutStatus,
   useShortcutUpdate,
@@ -22,10 +21,13 @@ export {
 
 // Export enhanced keyboard shortcut hook
 export {
-  useKeyboardShortcut,
+  useKey,
   AvailableShortcuts,
   getRegisteredShortcuts,
-} from './useKeyboardShortcut';
+} from './useKey';
+
+// For backward compatibility (deprecated)
+export { useKey as useKeyboardShortcut } from './useKey';
 
 export { ShortcutSheet, ShortcutSheetStyles } from './ShortcutSheet';
 
