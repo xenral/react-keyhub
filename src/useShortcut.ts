@@ -42,12 +42,17 @@ export function useShortcut<T extends AvailableShortcuts>(
         return;
       }
 
-      // Register the callback
-      subscriptionIdRef.current = eventBus.on(shortcutId as string, callback);
+      // Register the callback - this is the critical part
+      const id = eventBus.on(shortcutId as string, callback);
+      subscriptionIdRef.current = id;
+      
+      // Log for debugging
+      console.log(`Registered shortcut "${String(shortcutId)}" with subscription ID: ${id}`);
       
       // Cleanup function
       return () => {
         if (subscriptionIdRef.current) {
+          console.log(`Unregistering shortcut "${String(shortcutId)}" with subscription ID: ${subscriptionIdRef.current}`);
           eventBus.off(subscriptionIdRef.current);
           subscriptionIdRef.current = null;
         }

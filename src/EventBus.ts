@@ -253,6 +253,9 @@ export class EventBus {
     // Sort subscriptions by priority (highest first)
     subscriptions.sort((a, b) => b.priority - a.priority);
 
+    console.log(`Registered shortcut "${shortcutId}" with key combo "${normalizedKeyCombo}" and subscription ID "${subscriptionId}"`);
+    console.log(`Current subscriptions for "${normalizedKeyCombo}":`, subscriptions.length);
+
     return subscriptionId;
   }
 
@@ -287,6 +290,8 @@ export class EventBus {
   private emit(keyCombo: string, event: KeyboardEvent): void {
     const normalizedKeyCombo = normalizeKeyCombo(keyCombo);
     
+    console.log(`Emitting event for key combo: "${normalizedKeyCombo}"`);
+    
     // Find the shortcut configuration for this key combo
     const shortcutEntries = Object.entries(this.shortcuts).filter(
       ([_, config]) => 
@@ -294,7 +299,12 @@ export class EventBus {
         normalizeKeyCombo(config.keyCombo) === normalizedKeyCombo
     );
     
-    if (shortcutEntries.length === 0) return;
+    if (shortcutEntries.length === 0) {
+      console.log(`No shortcuts found for key combo: "${normalizedKeyCombo}"`);
+      return;
+    }
+    
+    console.log(`Found ${shortcutEntries.length} shortcuts for key combo: "${normalizedKeyCombo}"`);
     
     // Sort shortcuts by priority (highest first)
     shortcutEntries.sort((a, b) => b[1].priority - a[1].priority);
@@ -306,9 +316,13 @@ export class EventBus {
         (!config.context || this.activeContext === config.context)
     );
     
-    if (!matchingShortcut) return;
+    if (!matchingShortcut) {
+      console.log(`No matching shortcut found for key combo: "${normalizedKeyCombo}" with current context: "${this.activeContext}"`);
+      return;
+    }
     
     const [shortcutId, shortcut] = matchingShortcut;
+    console.log(`Matched shortcut: "${shortcutId}" for key combo: "${normalizedKeyCombo}"`);
     
     // Prevent default browser behavior if configured
     if (this.options.preventDefault) {
@@ -322,11 +336,13 @@ export class EventBus {
     
     // Get the subscriptions for this shortcut
     const subscriptions = this.subscriptions.get(normalizedKeyCombo) || [];
+    console.log(`Found ${subscriptions.length} subscriptions for key combo: "${normalizedKeyCombo}"`);
     
     // Execute all subscribed callbacks in priority order
     let handled = false;
     
     for (const subscription of subscriptions) {
+      console.log(`Executing callback for subscription: "${subscription.id}"`);
       subscription.callback(event);
       handled = true;
       break; // Only execute the highest priority callback
@@ -334,6 +350,7 @@ export class EventBus {
     
     // If no callbacks were executed and there's a default action, execute it
     if (!handled && shortcut.action) {
+      console.log(`Executing default action for shortcut: "${shortcutId}"`);
       shortcut.action(event);
     }
   }
