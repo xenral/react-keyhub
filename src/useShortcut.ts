@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useKeyHub, useKeyHubShortcuts } from './KeyHubContext';
 import { ShortcutCallback, ShortcutSettings } from './types';
+import { normalizeKeyCombo } from './utils';
 
 /**
  * Type helper to get the available shortcuts from the current provider
@@ -100,9 +101,4 @@ export function getRegisteredShortcuts(): ShortcutSettings {
     console.warn('Unable to get registered shortcuts:', error);
     return {};
   }
-}
-
-// Helper function to normalize key combos (imported from utils)
-function normalizeKeyCombo(keyCombo: string): string {
-  return keyCombo.toLowerCase().split('+').sort().join('+');
 } 

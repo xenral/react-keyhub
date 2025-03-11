@@ -255,6 +255,12 @@ export class EventBus {
 
     console.log(`Registered shortcut "${shortcutId}" with key combo "${normalizedKeyCombo}" and subscription ID "${subscriptionId}"`);
     console.log(`Current subscriptions for "${normalizedKeyCombo}":`, subscriptions.length);
+    
+    // Debug: Log all current subscriptions
+    console.log('All current subscriptions:');
+    this.subscriptions.forEach((subs, keyCombo) => {
+      console.log(`- ${keyCombo}: ${subs.length} subscriptions`);
+    });
 
     return subscriptionId;
   }
@@ -292,6 +298,12 @@ export class EventBus {
     
     console.log(`Emitting event for key combo: "${normalizedKeyCombo}"`);
     
+    // Debug: Log all current subscriptions
+    console.log('All current subscriptions at emit time:');
+    this.subscriptions.forEach((subs, keyCombo) => {
+      console.log(`- ${keyCombo}: ${subs.length} subscriptions`);
+    });
+    
     // Find the shortcut configuration for this key combo
     const shortcutEntries = Object.entries(this.shortcuts).filter(
       ([_, config]) => 
@@ -305,6 +317,12 @@ export class EventBus {
     }
     
     console.log(`Found ${shortcutEntries.length} shortcuts for key combo: "${normalizedKeyCombo}"`);
+    
+    // Debug: Log the shortcut entries found
+    shortcutEntries.forEach(([id, config]) => {
+      const keyCombo = config.type === 'sequence' ? (config as any).sequence : (config as any).keyCombo;
+      console.log(`- Shortcut: ${id}, Key Combo: ${keyCombo}, Normalized: ${normalizeKeyCombo(keyCombo)}`);
+    });
     
     // Sort shortcuts by priority (highest first)
     shortcutEntries.sort((a, b) => b[1].priority - a[1].priority);
