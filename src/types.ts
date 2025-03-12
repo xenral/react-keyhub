@@ -131,6 +131,7 @@ export interface ShortcutSubscription {
   id: string;
   callback: ShortcutCallback;
   priority: number;
+  shortcutId: string;
 }
 
 /**

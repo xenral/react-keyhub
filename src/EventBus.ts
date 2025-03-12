@@ -245,12 +245,10 @@ export class EventBus {
     const subscription: ShortcutSubscription = {
       id: subscriptionId,
       callback,
-      priority: shortcut.priority
+      priority: shortcut.priority,
+      shortcutId // Store the shortcut ID with the subscription
     };
 
-    // Store the subscription by both shortcut ID and normalized key combo
-    // This ensures we can find it regardless of how we look it up
-    
     // Store by normalized key combo
     if (!this.subscriptions.has(normalizedKeyCombo)) {
       this.subscriptions.set(normalizedKeyCombo, []);
@@ -260,7 +258,6 @@ export class EventBus {
     keyComboSubscriptions.sort((a, b) => b.priority - a.priority);
     
     // Also store a mapping from shortcut ID to normalized key combo
-    // This helps us find the right key combo when looking up by shortcut ID
     this._shortcutIdToKeyCombo = this._shortcutIdToKeyCombo || new Map();
     this._shortcutIdToKeyCombo.set(shortcutId, normalizedKeyCombo);
 
@@ -307,6 +304,10 @@ export class EventBus {
     console.log('All current subscriptions at emit time:');
     this.subscriptions.forEach((subs, keyCombo) => {
       console.log(`- ${keyCombo}: ${subs.length} subscriptions`);
+      // Log each subscription in detail
+      subs.forEach(sub => {
+        console.log(`  - Subscription ID: ${sub.id}, ShortcutId: ${sub.shortcutId}`);
+      });
     });
     
     // Get the subscriptions for this key combo
@@ -317,8 +318,7 @@ export class EventBus {
     if (subscriptions.length > 0) {
       // Execute the highest priority subscription
       const subscription = subscriptions[0]; // Already sorted by priority
-      console.log(`Executing callback for subscription: "${subscription.id}"`);
-      subscription.callback(event);
+      console.log(`Executing callback for subscription: "${subscription.id}" for shortcut: "${subscription.shortcutId}"`);
       
       // Prevent default and stop propagation if configured
       if (this.options.preventDefault) {
@@ -328,6 +328,8 @@ export class EventBus {
         event.stopPropagation();
       }
       
+      // Execute the callback
+      subscription.callback(event);
       return;
     }
     
