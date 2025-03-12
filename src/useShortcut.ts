@@ -43,25 +43,33 @@ export function useShortcut<T extends AvailableShortcuts>(
 
   // This effect handles the subscription and only runs when shortcutId or eventBus changes
   useEffect(() => {
+    // Cleanup function to ensure we don't have duplicate subscriptions
+    const cleanup = () => {
+      if (subscriptionIdRef.current) {
+        console.log(`Cleaning up previous subscription: ${subscriptionIdRef.current}`);
+        eventBus.off(subscriptionIdRef.current);
+        subscriptionIdRef.current = null;
+      }
+    };
+
+    // Clean up any existing subscription first
+    cleanup();
+
     try {
       // Check if the shortcut exists in the registered shortcuts
       isRegisteredRef.current = shortcutId in shortcuts;
 
       if (!isRegisteredRef.current) {
         console.warn(`Shortcut "${String(shortcutId)}" is not registered. Available shortcuts: ${Object.keys(shortcuts).join(', ')}`);
-        return;
+        return cleanup;
       }
 
       // Get the shortcut configuration
       const shortcut = shortcuts[shortcutId];
-      const normalizedKeyCombo = shortcut.type === 'sequence' 
-        ? shortcutId as string 
-        : normalizeKeyCombo(shortcut.keyCombo);
-      
-      console.log(`Registering shortcut "${String(shortcutId)}" with key combo "${normalizedKeyCombo}"`);
       
       // Create a stable wrapper function that calls the current callback from the ref
       const stableCallback: ShortcutCallback = (event) => {
+        console.log(`Executing callback for shortcut: ${String(shortcutId)}`);
         callbackRef.current(event);
       };
       
@@ -69,20 +77,20 @@ export function useShortcut<T extends AvailableShortcuts>(
       const id = eventBus.on(shortcutId as string, stableCallback);
       subscriptionIdRef.current = id;
       
-      // Log for debugging
-      console.log(`Registered shortcut "${String(shortcutId)}" with subscription ID: ${id}`);
+      if (!id) {
+        console.error(`Failed to register shortcut: ${String(shortcutId)}`);
+        isRegisteredRef.current = false;
+        return cleanup;
+      }
       
-      // Cleanup function
-      return () => {
-        if (subscriptionIdRef.current) {
-          console.log(`Unregistering shortcut "${String(shortcutId)}" with subscription ID: ${subscriptionIdRef.current}`);
-          eventBus.off(subscriptionIdRef.current);
-          subscriptionIdRef.current = null;
-        }
-      };
+      console.log(`Successfully registered shortcut: ${String(shortcutId)} with ID: ${id}`);
+      
+      // Return cleanup function
+      return cleanup;
     } catch (error) {
-      console.error('Error in useShortcut:', error);
-      return undefined;
+      console.error(`Error in useShortcut for ${String(shortcutId)}:`, error);
+      isRegisteredRef.current = false;
+      return cleanup;
     }
   }, [eventBus, shortcutId, shortcuts]); // Removed callback from dependencies
 
