@@ -48,7 +48,7 @@ export function useShortcut<T extends AvailableShortcuts>(
       if (subscriptionIdRef.current) {
         console.log(`Cleaning up previous subscription: ${subscriptionIdRef.current}`);
         try {
-          eventBus.off(subscriptionIdRef.current);
+          eventBus?.off(subscriptionIdRef.current);
         } catch (error) {
           console.error(`Error cleaning up subscription ${subscriptionIdRef.current}:`, error);
         }

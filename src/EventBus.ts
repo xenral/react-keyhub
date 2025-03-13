@@ -377,6 +377,50 @@ export class EventBus {
       return;
     }
 
+    // If no direct subscriptions, try to find subscriptions by shortcut ID
+    // This is a fallback mechanism in case the key combo mapping is inconsistent
+    let foundByShortcutId = false;
+    
+    // Check all subscriptions to see if any match the current key combo
+    this.subscriptions.forEach((subs, storedKeyCombo) => {
+      if (foundByShortcutId) return; // Skip if we already found a match
+      
+      subs.forEach(sub => {
+        if (foundByShortcutId) return; // Skip if we already found a match
+        
+        // Get the shortcut config for this subscription
+        const shortcut = this.shortcuts[sub.shortcutId];
+        if (!shortcut) return;
+        
+        // Check if this shortcut's key combo matches the current key combo
+        const shortcutKeyCombo = shortcut.type === 'sequence' 
+          ? shortcut.sequence 
+          : shortcut.keyCombo;
+        
+        if (normalizeKeyCombo(shortcutKeyCombo) === normalizedKeyCombo) {
+          console.log(`Found subscription by shortcut ID: ${sub.shortcutId}, executing callback`);
+          
+          // Prevent default and stop propagation if configured
+          if (this.options.preventDefault) {
+            event.preventDefault();
+          }
+          if (this.options.stopPropagation) {
+            event.stopPropagation();
+          }
+          
+          try {
+            // Execute the callback
+            sub.callback(event);
+            foundByShortcutId = true;
+          } catch (error) {
+            console.error(`Error executing callback for subscription: "${sub.id}"`, error);
+          }
+        }
+      });
+    });
+    
+    if (foundByShortcutId) return;
+
     // If no direct subscriptions, find the shortcut configuration for this key combo
     const shortcutEntries = Object.entries(this.shortcuts).filter(
       ([_, config]) => {

@@ -4,28 +4,53 @@
  * @returns The normalized key combination
  */
 export const normalizeKeyCombo = (keyCombo: string): string => {
-  // Split the key combination by '+' and sort the modifiers
+  // Handle empty or undefined input
+  if (!keyCombo) return '';
+  
+  // Handle sequence shortcuts (space-separated key combos)
+  if (keyCombo.includes(' ')) {
+    return keyCombo.split(' ')
+      .map(combo => normalizeKeyCombo(combo))
+      .join(' ');
+  }
+  
+  // Split the key combination by '+' and convert to lowercase
   const parts = keyCombo.toLowerCase().split('+');
   
   // Extract modifiers and the main key
   const modifiers = parts.filter(part => 
-    ['ctrl', 'control', 'alt', 'shift', 'meta', 'cmd', 'command'].includes(part)
-  ).sort();
+    ['ctrl', 'control', 'alt', 'option', 'shift', 'meta', 'cmd', 'command', 'win', 'windows'].includes(part)
+  );
   
   // Normalize modifier names
   const normalizedModifiers = modifiers.map(mod => {
     if (mod === 'control') return 'ctrl';
-    if (mod === 'cmd' || mod === 'command') return 'meta';
+    if (mod === 'option') return 'alt';
+    if (['cmd', 'command', 'win', 'windows'].includes(mod)) return 'meta';
     return mod;
   });
   
-  // Get the main key (the last part that's not a modifier)
-  const mainKey = parts.find(part => 
-    !['ctrl', 'control', 'alt', 'shift', 'meta', 'cmd', 'command'].includes(part)
-  ) || '';
+  // Get the main key (the part that's not a modifier)
+  const mainKeys = parts.filter(part => 
+    !['ctrl', 'control', 'alt', 'option', 'shift', 'meta', 'cmd', 'command', 'win', 'windows'].includes(part)
+  );
+  
+  // Normalize special keys
+  const normalizedMainKeys = mainKeys.map(key => {
+    if (key === 'space') return 'space';
+    if (key === 'escape') return 'esc';
+    if (key === 'arrowup') return 'up';
+    if (key === 'arrowdown') return 'down';
+    if (key === 'arrowleft') return 'left';
+    if (key === 'arrowright') return 'right';
+    return key;
+  });
+  
+  // Remove duplicates and sort modifiers for consistent ordering
+  const uniqueModifiers = Array.from(new Set(normalizedModifiers)).sort();
   
   // Combine the normalized modifiers and the main key
-  return Array.from(new Set(normalizedModifiers)).concat(mainKey).filter(Boolean).join('+');
+  return [...uniqueModifiers, ...normalizedMainKeys].filter(Boolean).join('+');
 };
 
 /**
@@ -53,7 +78,7 @@ export const eventToKeyCombo = (event: KeyboardEvent): string => {
   if (key === 'arrowright') normalizedKey = 'right';
   
   // Don't include the key if it's a modifier key itself
-  if (['control', 'alt', 'shift', 'meta'].includes(key)) {
+  if (['control', 'ctrl', 'alt', 'shift', 'meta', 'command', 'cmd'].includes(key)) {
     return modifiers.sort().join('+');
   }
   
