@@ -283,17 +283,24 @@ export class EventBus {
     console.log('All current subscriptions:');
     this.subscriptions.forEach((subs, keyCombo) => {
       console.log(`- ${keyCombo}: ${subs.length} subscriptions`);
+      subs.forEach(sub => {
+        console.log(`  - Subscription ID: ${sub.id}, ShortcutId: ${sub.shortcutId}`);
+      });
     });
-    this.logAll()
+    
     return subscriptionId;
   }
 
   private logAll() {
-    console.log('All current subscriptions:');
+    console.log('All current subscriptions (detailed):');
     this.subscriptions.forEach((subs, keyCombo) => {
       console.log(`- ${keyCombo}: ${subs.length} subscriptions`);
+      subs.forEach(sub => {
+        console.log(`  - Subscription ID: ${sub.id}, ShortcutId: ${sub.shortcutId}`);
+      });
     });
   }
+
   /**
    * Unsubscribes from a keyboard shortcut
    * @param subscriptionId The ID of the subscription to remove
@@ -372,9 +379,16 @@ export class EventBus {
 
     // If no direct subscriptions, find the shortcut configuration for this key combo
     const shortcutEntries = Object.entries(this.shortcuts).filter(
-      ([_, config]) =>
-        config.type !== 'sequence' &&
-        normalizeKeyCombo(config.keyCombo) === normalizedKeyCombo
+      ([_, config]) => {
+        if (config.type === 'sequence') return false;
+        
+        const shortcutKeyCombo = normalizeKeyCombo(config.keyCombo);
+        const matches = shortcutKeyCombo === normalizedKeyCombo;
+        
+        console.log(`Checking shortcut: ${config.name}, Key Combo: ${config.keyCombo}, Normalized: ${shortcutKeyCombo}, Matches: ${matches}`);
+        
+        return matches;
+      }
     );
 
     if (shortcutEntries.length === 0) {

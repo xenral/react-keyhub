@@ -47,13 +47,24 @@ export function useShortcut<T extends AvailableShortcuts>(
     const cleanup = () => {
       if (subscriptionIdRef.current) {
         console.log(`Cleaning up previous subscription: ${subscriptionIdRef.current}`);
-        eventBus.off(subscriptionIdRef.current);
+        try {
+          eventBus.off(subscriptionIdRef.current);
+        } catch (error) {
+          console.error(`Error cleaning up subscription ${subscriptionIdRef.current}:`, error);
+        }
         subscriptionIdRef.current = null;
       }
     };
 
     // Clean up any existing subscription first
     cleanup();
+
+    // Skip if eventBus is not available
+    if (!eventBus) {
+      console.error('EventBus is not available. Make sure useShortcut is used within a KeyHubProvider.');
+      isRegisteredRef.current = false;
+      return cleanup;
+    }
 
     try {
       // Check if the shortcut exists in the registered shortcuts
@@ -67,18 +78,24 @@ export function useShortcut<T extends AvailableShortcuts>(
       // Create a stable wrapper function that calls the current callback from the ref
       const stableCallback: ShortcutCallback = (event) => {
         console.log(`Executing callback for shortcut: ${String(shortcutId)}`);
-        callbackRef.current(event);
+        try {
+          callbackRef.current(event);
+        } catch (error) {
+          console.error(`Error executing callback for shortcut ${String(shortcutId)}:`, error);
+        }
       };
       
       // Register the callback - this is the critical part
       const id = eventBus.on(shortcutId as string, stableCallback);
-      subscriptionIdRef.current = id;
       
       if (!id) {
         console.error(`Failed to register shortcut: ${String(shortcutId)}`);
         isRegisteredRef.current = false;
         return cleanup;
       }
+      
+      // Store the subscription ID
+      subscriptionIdRef.current = id;
       
       console.log(`Successfully registered shortcut: ${String(shortcutId)} with ID: ${id}`);
       
