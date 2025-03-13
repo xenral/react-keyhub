@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useKeyHub, useKeyHubShortcuts } from './KeyHubContext';
 import { ShortcutCallback, ShortcutSettings } from './types';
-import { normalizeKeyCombo } from './utils';
 
 /**
  * Type helper to get the available shortcuts from the current provider
@@ -24,6 +23,7 @@ export type AvailableShortcuts = keyof ProviderShortcuts;
  *   console.log('Save triggered!');
  * });
  */
+
 export function useShortcut<T extends AvailableShortcuts>(
   shortcutId: T,
   callback: ShortcutCallback
@@ -63,9 +63,6 @@ export function useShortcut<T extends AvailableShortcuts>(
         console.warn(`Shortcut "${String(shortcutId)}" is not registered. Available shortcuts: ${Object.keys(shortcuts).join(', ')}`);
         return cleanup;
       }
-
-      // Get the shortcut configuration
-      const shortcut = shortcuts[shortcutId];
       
       // Create a stable wrapper function that calls the current callback from the ref
       const stableCallback: ShortcutCallback = (event) => {

@@ -29,7 +29,7 @@
         "keybindings",
         "typescript"
     ],
-    "author": "",
+    "author": "Ali Morshedzadeh",
     "license": "MIT",
     "peerDependencies": {
         "react": ">=16.8.0",
@@ -76,8 +76,7 @@
         "example": "examples",
         "test": "tests"
     },
-    "size-limit": [
-        {
+    "size-limit": [{
             "path": "dist/index.js",
             "limit": "10 KB"
         },
