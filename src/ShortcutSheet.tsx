@@ -399,7 +399,7 @@ export const ShortcutSheetStyles = `
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   width: 90%;
   max-width: 1000px;
-  max-height: 85vh;
+  max-height: 100vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;

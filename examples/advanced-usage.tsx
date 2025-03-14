@@ -465,7 +465,7 @@ const EditorSection: React.FC<EditorSectionProps> = ({ theme, layout }) => {
   useShortcut('gitCommands', () => {
     showMessage('info', 'Git commands menu opened');
   });
-  
+   
   // Subscribe to the "gitStatus" sequence shortcut
   useShortcut('gitStatus', () => {
     showMessage('info', 'Git status: 2 files changed, 1 file added');
