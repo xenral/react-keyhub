@@ -4,8 +4,8 @@ A lightweight, scalable keyboard shortcut manager for React applications with Ty
 
 [![npm version](https://img.shields.io/npm/v/react-keyhub.svg)](https://www.npmjs.com/package/react-keyhub)
 [![npm downloads](https://img.shields.io/npm/dm/react-keyhub.svg)](https://www.npmjs.com/package/react-keyhub)
-[![license](https://img.shields.io/npm/l/react-keyhub.svg)](https://github.com/alimorshedzadeh/react-keyhub/blob/main/LICENSE)
-[![CI](https://github.com/alimorshedzadeh/react-keyhub/actions/workflows/ci.yml/badge.svg)](https://github.com/alimorshedzadeh/react-keyhub/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/react-keyhub.svg)](https://github.com/xenral/react-keyhub/blob/main/LICENSE)
+[![CI](https://github.com/xenral/react-keyhub/actions/workflows/ci.yml/badge.svg)](https://github.com/xenral/react-keyhub/actions/workflows/ci.yml)
 
 ## Features
 

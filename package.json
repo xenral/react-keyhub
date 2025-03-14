@@ -66,18 +66,17 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/alimorshedzadeh/react-keyhub.git"
+        "url": "git+https://github.com/xenral/react-keyhub.git"
     },
     "bugs": {
-        "url": "https://github.com/alimorshedzadeh/react-keyhub/issues"
+        "url": "https://github.com/xenral/react-keyhub/issues"
     },
-    "homepage": "https://github.com/alimorshedzadeh/react-keyhub#readme",
+    "homepage": "https://github.com/xenral/react-keyhub#readme",
     "directories": {
         "example": "examples",
         "test": "tests"
     },
-    "size-limit": [
-        {
+    "size-limit": [{
             "path": "dist/index.js",
             "limit": "10 KB"
         },
