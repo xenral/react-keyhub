@@ -30,6 +30,7 @@ const DEFAULT_OPTIONS: EventBusOptions = {
 export class EventBus {
   private shortcuts: ShortcutSettings;
   private subscriptions: Map<string, ShortcutSubscription[]>;
+  private shortcutIdToSubscriptions: Map<string, ShortcutSubscription[]>;
   private options: Required<EventBusOptions>;
   private isListening: boolean;
   private handleKeyDown: (e: Event) => void;
@@ -47,6 +48,7 @@ export class EventBus {
   constructor(shortcuts: ShortcutSettings, options: EventBusOptions = {}) {
     this.shortcuts = shortcuts;
     this.subscriptions = new Map();
+    this.shortcutIdToSubscriptions = new Map();
     this.options = { ...DEFAULT_OPTIONS, ...options } as Required<EventBusOptions>;
     this.isListening = false;
 
@@ -190,26 +192,24 @@ export class EventBus {
           event.stopPropagation();
         }
 
-        // Get the subscriptions for this shortcut
-        const normalizedKeyCombo = shortcutId;
-        // Make sure we get a fresh reference to the array
-        const subscriptions = [...(this.subscriptions.get(normalizedKeyCombo) || [])];
-
-        // Execute all subscribed callbacks in priority order
-        let handled = false;
-
-        for (const subscription of subscriptions) {
+        // Check if there are any subscriptions for this shortcut ID
+        const shortcutSubscriptions = this.shortcutIdToSubscriptions.get(shortcutId) || [];
+        
+        if (shortcutSubscriptions.length > 0) {
+          console.log(`Found ${shortcutSubscriptions.length} subscriptions for sequence shortcut "${shortcutId}"`);
+          
+          // Execute the highest priority subscription
+          const subscription = shortcutSubscriptions[0]; // Already sorted by priority
+          console.log(`Executing callback for subscription: "${subscription.id}" for sequence shortcut: "${shortcutId}"`);
+          
           try {
             subscription.callback(event);
-            handled = true;
-            break; // Only execute the highest priority callback
           } catch (error) {
             console.error(`Error executing callback for sequence subscription: "${subscription.id}"`, error);
           }
-        }
-
-        // If no callbacks were executed and there's a default action, execute it
-        if (!handled && config.action) {
+        } else if (config.action) {
+          // If no subscriptions but there's a default action, execute it
+          console.log(`Executing default action for sequence shortcut: "${shortcutId}"`);
           try {
             config.action(event);
           } catch (error) {
@@ -264,13 +264,18 @@ export class EventBus {
     }
     
     // Get a reference to the array and then modify it
-    // This ensures the array reference in the Map is updated
     const subscriptions = this.subscriptions.get(normalizedKeyCombo)!;
     subscriptions.push(subscription);
     subscriptions.sort((a, b) => b.priority - a.priority);
     
-    // Make sure the Map is updated with the modified array
-    this.subscriptions.set(normalizedKeyCombo, subscriptions);
+    // Also store by shortcut ID for direct lookup
+    if (!this.shortcutIdToSubscriptions.has(shortcutId)) {
+      this.shortcutIdToSubscriptions.set(shortcutId, []);
+    }
+    
+    const shortcutSubscriptions = this.shortcutIdToSubscriptions.get(shortcutId)!;
+    shortcutSubscriptions.push(subscription);
+    shortcutSubscriptions.sort((a, b) => b.priority - a.priority);
 
     // Also store a mapping from shortcut ID to normalized key combo
     this._shortcutIdToKeyCombo = this._shortcutIdToKeyCombo || new Map();
@@ -278,9 +283,19 @@ export class EventBus {
 
     console.log(`Registered shortcut "${shortcutId}" with key combo "${normalizedKeyCombo}" and subscription ID "${subscriptionId}"`);
     console.log(`Current subscriptions for "${normalizedKeyCombo}":`, subscriptions.length);
+    console.log(`Current subscriptions for shortcut "${shortcutId}":`, shortcutSubscriptions.length);
 
     // Debug: Log all current subscriptions
-    console.log('All current subscriptions:');
+    this.logSubscriptions();
+    
+    return subscriptionId;
+  }
+
+  /**
+   * Log all current subscriptions for debugging
+   */
+  private logSubscriptions(): void {
+    console.log('All current subscriptions by key combo:');
     this.subscriptions.forEach((subs, keyCombo) => {
       console.log(`- ${keyCombo}: ${subs.length} subscriptions`);
       subs.forEach(sub => {
@@ -288,15 +303,11 @@ export class EventBus {
       });
     });
     
-    return subscriptionId;
-  }
-
-  private logAll() {
-    console.log('All current subscriptions (detailed):');
-    this.subscriptions.forEach((subs, keyCombo) => {
-      console.log(`- ${keyCombo}: ${subs.length} subscriptions`);
+    console.log('All current subscriptions by shortcut ID:');
+    this.shortcutIdToSubscriptions.forEach((subs, shortcutId) => {
+      console.log(`- ${shortcutId}: ${subs.length} subscriptions`);
       subs.forEach(sub => {
-        console.log(`  - Subscription ID: ${sub.id}, ShortcutId: ${sub.shortcutId}`);
+        console.log(`  - Subscription ID: ${sub.id}`);
       });
     });
   }
@@ -306,7 +317,9 @@ export class EventBus {
    * @param subscriptionId The ID of the subscription to remove
    */
   public off(subscriptionId: string): void {
-    // Find the subscription in all key combos
+    let found = false;
+    
+    // Remove from key combo map
     for (const [keyCombo, subscriptions] of this.subscriptions.entries()) {
       const index = subscriptions.findIndex(sub => sub.id === subscriptionId);
 
@@ -320,13 +333,36 @@ export class EventBus {
         
         // Update the Map with the new array
         this.subscriptions.set(keyCombo, updatedSubscriptions);
-        
         console.log(`Updated subscriptions for "${keyCombo}":`, updatedSubscriptions.length);
-        return;
+        found = true;
+        // Don't return yet, we need to remove from the shortcut ID map too
       }
     }
     
-    console.warn(`Subscription "${subscriptionId}" not found`);
+    // Remove from shortcut ID map
+    for (const [shortcutId, subscriptions] of this.shortcutIdToSubscriptions.entries()) {
+      const index = subscriptions.findIndex(sub => sub.id === subscriptionId);
+
+      if (index !== -1) {
+        console.log(`Removing subscription "${subscriptionId}" from shortcut "${shortcutId}"`);
+        // Create a new array without the subscription
+        const updatedSubscriptions = [
+          ...subscriptions.slice(0, index),
+          ...subscriptions.slice(index + 1)
+        ];
+        
+        // Update the Map with the new array
+        this.shortcutIdToSubscriptions.set(shortcutId, updatedSubscriptions);
+        console.log(`Updated subscriptions for shortcut "${shortcutId}":`, updatedSubscriptions.length);
+        found = true;
+        // We found and removed the subscription, so we can break out of the loop
+        break;
+      }
+    }
+    
+    if (!found) {
+      console.warn(`Subscription "${subscriptionId}" not found`);
+    }
   }
 
   /**
@@ -340,17 +376,9 @@ export class EventBus {
     console.log(`Emitting event for key combo: "${normalizedKeyCombo}"`);
 
     // Debug: Log all current subscriptions
-    console.log('All current subscriptions at emit time:');
-    this.subscriptions.forEach((subs, keyCombo) => {
-      console.log(`- ${keyCombo}: ${subs.length} subscriptions`);
-      // Log each subscription in detail
-      subs.forEach(sub => {
-        console.log(`  - Subscription ID: ${sub.id}, ShortcutId: ${sub.shortcutId}`);
-      });
-    });
+    this.logSubscriptions();
 
     // Get the subscriptions for this key combo
-    // Make sure we get a fresh reference to the array
     const subscriptions = [...(this.subscriptions.get(normalizedKeyCombo) || [])];
     console.log(`Found ${subscriptions.length} direct subscriptions for key combo: "${normalizedKeyCombo}"`);
 
@@ -377,112 +405,78 @@ export class EventBus {
       return;
     }
 
-    // If no direct subscriptions, try to find subscriptions by shortcut ID
-    // This is a fallback mechanism in case the key combo mapping is inconsistent
-    let foundByShortcutId = false;
-    
-    // Check all subscriptions to see if any match the current key combo
-    this.subscriptions.forEach((subs, storedKeyCombo) => {
-      if (foundByShortcutId) return; // Skip if we already found a match
+    // Find shortcuts that match this key combo
+    const matchingShortcuts = Object.entries(this.shortcuts).filter(([_, config]) => {
+      if (config.type === 'sequence') return false;
       
-      subs.forEach(sub => {
-        if (foundByShortcutId) return; // Skip if we already found a match
-        
-        // Get the shortcut config for this subscription
-        const shortcut = this.shortcuts[sub.shortcutId];
-        if (!shortcut) return;
-        
-        // Check if this shortcut's key combo matches the current key combo
-        const shortcutKeyCombo = shortcut.type === 'sequence' 
-          ? shortcut.sequence 
-          : shortcut.keyCombo;
-        
-        if (normalizeKeyCombo(shortcutKeyCombo) === normalizedKeyCombo) {
-          console.log(`Found subscription by shortcut ID: ${sub.shortcutId}, executing callback`);
-          
-          // Prevent default and stop propagation if configured
-          if (this.options.preventDefault) {
-            event.preventDefault();
-          }
-          if (this.options.stopPropagation) {
-            event.stopPropagation();
-          }
-          
-          try {
-            // Execute the callback
-            sub.callback(event);
-            foundByShortcutId = true;
-          } catch (error) {
-            console.error(`Error executing callback for subscription: "${sub.id}"`, error);
-          }
-        }
-      });
+      const shortcutKeyCombo = normalizeKeyCombo(config.keyCombo);
+      const matches = shortcutKeyCombo === normalizedKeyCombo;
+      
+      console.log(`Checking shortcut: ${config.name}, Key Combo: ${config.keyCombo}, Normalized: ${shortcutKeyCombo}, Matches: ${matches}`);
+      
+      return matches;
     });
-    
-    if (foundByShortcutId) return;
 
-    // If no direct subscriptions, find the shortcut configuration for this key combo
-    const shortcutEntries = Object.entries(this.shortcuts).filter(
-      ([_, config]) => {
-        if (config.type === 'sequence') return false;
-        
-        const shortcutKeyCombo = normalizeKeyCombo(config.keyCombo);
-        const matches = shortcutKeyCombo === normalizedKeyCombo;
-        
-        console.log(`Checking shortcut: ${config.name}, Key Combo: ${config.keyCombo}, Normalized: ${shortcutKeyCombo}, Matches: ${matches}`);
-        
-        return matches;
-      }
-    );
-
-    if (shortcutEntries.length === 0) {
+    if (matchingShortcuts.length === 0) {
       console.log(`No shortcuts found for key combo: "${normalizedKeyCombo}"`);
       return;
     }
 
-    console.log(`Found ${shortcutEntries.length} shortcuts for key combo: "${normalizedKeyCombo}"`);
+    console.log(`Found ${matchingShortcuts.length} shortcuts for key combo: "${normalizedKeyCombo}"`);
 
-    // Debug: Log the shortcut entries found
-    shortcutEntries.forEach(([id, config]) => {
-      const keyCombo = config.type === 'sequence' ? (config as any).sequence : (config as any).keyCombo;
-      console.log(`- Shortcut: ${id}, Key Combo: ${keyCombo}, Normalized: ${normalizeKeyCombo(keyCombo)}`);
-    });
+    // Check if any of these shortcuts have subscriptions
+    for (const [shortcutId, config] of matchingShortcuts) {
+      // Skip if the shortcut is disabled
+      if (config.status === 'disabled') continue;
 
-    // Sort shortcuts by priority (highest first)
-    shortcutEntries.sort((a, b) => b[1].priority - a[1].priority);
+      // Skip if the shortcut has a context and it doesn't match the active context
+      if (config.context && this.activeContext !== config.context) continue;
 
-    // Find the first shortcut that matches the active context
-    const matchingShortcut = shortcutEntries.find(
-      ([_, config]) =>
-        config.status === 'enabled' &&
-        (!config.context || this.activeContext === config.context)
-    );
-
-    if (!matchingShortcut) {
-      console.log(`No matching shortcut found for key combo: "${normalizedKeyCombo}" with current context: "${this.activeContext}"`);
-      return;
-    }
-
-    const [shortcutId, shortcut] = matchingShortcut;
-    console.log(`Matched shortcut: "${shortcutId}" for key combo: "${normalizedKeyCombo}"`);
-
-    // Prevent default browser behavior if configured
-    if (this.options.preventDefault) {
-      event.preventDefault();
-    }
-
-    // Stop propagation if configured
-    if (this.options.stopPropagation) {
-      event.stopPropagation();
-    }
-
-    // If the shortcut has a default action, execute it
-    if (shortcut.action) {
-      console.log(`Executing default action for shortcut: "${shortcutId}"`);
-      try {
-        shortcut.action(event);
-      } catch (error) {
-        console.error(`Error executing default action for shortcut: "${shortcutId}"`, error);
+      // Check if there are any subscriptions for this shortcut ID
+      const shortcutSubscriptions = this.shortcutIdToSubscriptions.get(shortcutId) || [];
+      
+      if (shortcutSubscriptions.length > 0) {
+        console.log(`Found ${shortcutSubscriptions.length} subscriptions for shortcut "${shortcutId}"`);
+        
+        // Execute the highest priority subscription
+        const subscription = shortcutSubscriptions[0]; // Already sorted by priority
+        console.log(`Executing callback for subscription: "${subscription.id}" for shortcut: "${shortcutId}"`);
+        
+        // Prevent default and stop propagation if configured
+        if (this.options.preventDefault) {
+          event.preventDefault();
+        }
+        if (this.options.stopPropagation) {
+          event.stopPropagation();
+        }
+        
+        try {
+          // Execute the callback
+          subscription.callback(event);
+          return; // We've handled the event, so we can return
+        } catch (error) {
+          console.error(`Error executing callback for subscription: "${subscription.id}"`, error);
+        }
+      }
+      
+      // If no subscriptions but there's a default action, execute it
+      if (config.action) {
+        console.log(`Executing default action for shortcut: "${shortcutId}"`);
+        
+        // Prevent default and stop propagation if configured
+        if (this.options.preventDefault) {
+          event.preventDefault();
+        }
+        if (this.options.stopPropagation) {
+          event.stopPropagation();
+        }
+        
+        try {
+          config.action(event);
+          return; // We've handled the event, so we can return
+        } catch (error) {
+          console.error(`Error executing default action for shortcut: "${shortcutId}"`, error);
+        }
       }
     }
   }
