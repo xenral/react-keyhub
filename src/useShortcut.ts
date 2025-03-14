@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useKeyHub, useKeyHubShortcuts } from './KeyHubContext';
-import { ShortcutCallback, ShortcutSettings } from './types';
+import { ShortcutCallback, ShortcutSettings, EventBusOptions } from './types';
+import { normalizeKeyCombo, eventToKeyCombo } from './utils';
 
 /**
  * Type helper to get the available shortcuts from the current provider
@@ -30,7 +31,6 @@ export function useShortcut<T extends AvailableShortcuts>(
 ): boolean {
   const eventBus = useKeyHub();
   const shortcuts = useKeyHubShortcuts();
-  const subscriptionIdRef = useRef<string | null>(null);
   const isRegisteredRef = useRef<boolean>(false);
   
   // Store the callback in a ref to avoid dependency issues
@@ -41,29 +41,75 @@ export function useShortcut<T extends AvailableShortcuts>(
     callbackRef.current = callback;
   }, [callback]);
 
-  // This effect handles the subscription and only runs when shortcutId or eventBus changes
-  useEffect(() => {
-    // Cleanup function to ensure we don't have duplicate subscriptions
-    const cleanup = () => {
-      if (subscriptionIdRef.current) {
-        console.log(`Cleaning up previous subscription: ${subscriptionIdRef.current}`);
-        try {
-          eventBus?.off(subscriptionIdRef.current);
-        } catch (error) {
-          console.error(`Error cleaning up subscription ${subscriptionIdRef.current}:`, error);
-        }
-        subscriptionIdRef.current = null;
-      }
-    };
+  // Create a stable handler function
+  const keyboardHandler = useCallback((event: Event) => {
+    const keyboardEvent = event as KeyboardEvent;
+    
+    // Skip if eventBus is paused
+    if (!eventBus || (eventBus as any).paused) return;
 
-    // Clean up any existing subscription first
-    cleanup();
+    // Get the shortcut configuration
+    const shortcut = shortcuts[shortcutId as string];
+    if (!shortcut) return;
+
+    // Skip if the shortcut is disabled
+    if (shortcut.status === 'disabled') return;
+
+    // Skip if the shortcut has a context and it doesn't match the active context
+    const activeContext = eventBus.getContext?.();
+    if (shortcut.context && activeContext !== shortcut.context) return;
+
+    // Get the key combo from the event
+    const keyCombo = eventToKeyCombo(keyboardEvent);
+    const normalizedKeyCombo = normalizeKeyCombo(keyCombo);
+
+    // Check if the key combo matches the shortcut
+    let matches = false;
+    
+    if (shortcut.type === 'regular') {
+      const shortcutKeyCombo = normalizeKeyCombo(shortcut.keyCombo);
+      matches = shortcutKeyCombo === normalizedKeyCombo;
+    } else if (shortcut.type === 'sequence') {
+      // For sequence shortcuts, we need to check the sequence buffer
+      // This is handled by the EventBus, so we'll skip it for now
+      return;
+    }
+
+    if (!matches) return;
+
+    // Get the EventBus options
+    const options = (eventBus as any).options as EventBusOptions;
+
+    // Prevent default browser behavior if configured
+    if (options?.preventDefault) {
+      keyboardEvent.preventDefault();
+    }
+
+    // Stop propagation if configured
+    if (options?.stopPropagation) {
+      keyboardEvent.stopPropagation();
+    }
+
+    // Execute the callback
+    console.log(`Executing callback for shortcut: ${String(shortcutId)}`);
+    try {
+      callbackRef.current(keyboardEvent);
+    } catch (error) {
+      console.error(`Error executing callback for shortcut ${String(shortcutId)}:`, error);
+    }
+  }, [eventBus, shortcutId, shortcuts]);
+
+  // This effect handles the direct event listener setup
+  useEffect(() => {
+    // Get the EventBus options
+    const options = (eventBus as any)?.options as EventBusOptions | undefined;
+    const target = options?.target;
 
     // Skip if eventBus is not available
-    if (!eventBus) {
+    if (!eventBus || !target) {
       console.error('EventBus is not available. Make sure useShortcut is used within a KeyHubProvider.');
       isRegisteredRef.current = false;
-      return cleanup;
+      return;
     }
 
     try {
@@ -72,41 +118,24 @@ export function useShortcut<T extends AvailableShortcuts>(
 
       if (!isRegisteredRef.current) {
         console.warn(`Shortcut "${String(shortcutId)}" is not registered. Available shortcuts: ${Object.keys(shortcuts).join(', ')}`);
-        return cleanup;
+        return;
       }
       
-      // Create a stable wrapper function that calls the current callback from the ref
-      const stableCallback: ShortcutCallback = (event) => {
-        console.log(`Executing callback for shortcut: ${String(shortcutId)}`);
-        try {
-          callbackRef.current(event);
-        } catch (error) {
-          console.error(`Error executing callback for shortcut ${String(shortcutId)}:`, error);
-        }
-      };
-      
-      // Register the callback - this is the critical part
-      const id = eventBus.on(shortcutId as string, stableCallback);
-      
-      if (!id) {
-        console.error(`Failed to register shortcut: ${String(shortcutId)}`);
-        isRegisteredRef.current = false;
-        return cleanup;
-      }
-      
-      // Store the subscription ID
-      subscriptionIdRef.current = id;
-      
-      console.log(`Successfully registered shortcut: ${String(shortcutId)} with ID: ${id}`);
+      // Add the event listener
+      console.log(`Adding direct event listener for shortcut: ${String(shortcutId)}`);
+      target.addEventListener('keydown', keyboardHandler);
       
       // Return cleanup function
-      return cleanup;
+      return () => {
+        console.log(`Removing direct event listener for shortcut: ${String(shortcutId)}`);
+        target.removeEventListener('keydown', keyboardHandler);
+      };
     } catch (error) {
       console.error(`Error in useShortcut for ${String(shortcutId)}:`, error);
       isRegisteredRef.current = false;
-      return cleanup;
+      return;
     }
-  }, [eventBus, shortcutId, shortcuts]); // Removed callback from dependencies
+  }, [eventBus, shortcutId, shortcuts, keyboardHandler]);
 
   return isRegisteredRef.current;
 }
