@@ -21,7 +21,7 @@ export type AvailableShortcuts = keyof ProviderShortcuts;
  * @example
  * // Will suggest all registered shortcuts like 'save', 'undo', etc.
  * const isSaveRegistered = useShortcut('save', (e) => {
- *   console.log('Save triggered!');
+ *   // Handle save shortcut
  * });
  */
 export function useShortcut<T extends AvailableShortcuts>(
@@ -93,7 +93,7 @@ export function useShortcut<T extends AvailableShortcuts>(
     try {
       callbackRef.current(keyboardEvent);
     } catch (error) {
-      console.error(`Error executing callback for shortcut ${String(shortcutId)}:`, error);
+      // Silent error handling
     }
   }, [eventBus, shortcutId, shortcuts]);
 
@@ -105,7 +105,6 @@ export function useShortcut<T extends AvailableShortcuts>(
 
     // Skip if eventBus is not available
     if (!eventBus || !target) {
-      console.error('EventBus is not available. Make sure useShortcut is used within a KeyHubProvider.');
       isRegisteredRef.current = false;
       return;
     }
@@ -115,7 +114,6 @@ export function useShortcut<T extends AvailableShortcuts>(
       isRegisteredRef.current = shortcutId in shortcuts;
 
       if (!isRegisteredRef.current) {
-        console.warn(`Shortcut "${String(shortcutId)}" is not registered. Available shortcuts: ${Object.keys(shortcuts).join(', ')}`);
         return;
       }
       
@@ -127,7 +125,6 @@ export function useShortcut<T extends AvailableShortcuts>(
         target.removeEventListener('keydown', keyboardHandler);
       };
     } catch (error) {
-      console.error(`Error in useShortcut for ${String(shortcutId)}:`, error);
       isRegisteredRef.current = false;
       return;
     }
@@ -145,7 +142,6 @@ export function getRegisteredShortcuts(): ShortcutSettings {
     const shortcuts = useKeyHubShortcuts();
     return shortcuts;
   } catch (error) {
-    console.warn('Unable to get registered shortcuts:', error);
     return {};
   }
 } 

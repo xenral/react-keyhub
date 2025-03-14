@@ -196,24 +196,20 @@ export class EventBus {
         const shortcutSubscriptions = this.shortcutIdToSubscriptions.get(shortcutId) || [];
         
         if (shortcutSubscriptions.length > 0) {
-          console.log(`Found ${shortcutSubscriptions.length} subscriptions for sequence shortcut "${shortcutId}"`);
-          
           // Execute the highest priority subscription
           const subscription = shortcutSubscriptions[0]; // Already sorted by priority
-          console.log(`Executing callback for subscription: "${subscription.id}" for sequence shortcut: "${shortcutId}"`);
           
           try {
             subscription.callback(event);
           } catch (error) {
-            console.error(`Error executing callback for sequence subscription: "${subscription.id}"`, error);
+            // Silent error handling
           }
         } else if (config.action) {
           // If no subscriptions but there's a default action, execute it
-          console.log(`Executing default action for sequence shortcut: "${shortcutId}"`);
           try {
             config.action(event);
           } catch (error) {
-            console.error(`Error executing default action for sequence shortcut: "${shortcutId}"`, error);
+            // Silent error handling
           }
         }
       });
@@ -237,7 +233,6 @@ export class EventBus {
     const shortcut = this.shortcuts[shortcutId];
 
     if (!shortcut) {
-      console.warn(`Shortcut "${shortcutId}" is not defined`);
       return '';
     }
 
@@ -281,12 +276,7 @@ export class EventBus {
     this._shortcutIdToKeyCombo = this._shortcutIdToKeyCombo || new Map();
     this._shortcutIdToKeyCombo.set(shortcutId, normalizedKeyCombo);
 
-    console.log(`Registered shortcut "${shortcutId}" with key combo "${normalizedKeyCombo}" and subscription ID "${subscriptionId}"`);
-    console.log(`Current subscriptions for "${normalizedKeyCombo}":`, subscriptions.length);
-    console.log(`Current subscriptions for shortcut "${shortcutId}":`, shortcutSubscriptions.length);
-
-    // Debug: Log all current subscriptions
-    this.logSubscriptions();
+    // Debug logging removed
     
     return subscriptionId;
   }
@@ -295,21 +285,7 @@ export class EventBus {
    * Log all current subscriptions for debugging
    */
   private logSubscriptions(): void {
-    console.log('All current subscriptions by key combo:');
-    this.subscriptions.forEach((subs, keyCombo) => {
-      console.log(`- ${keyCombo}: ${subs.length} subscriptions`);
-      subs.forEach(sub => {
-        console.log(`  - Subscription ID: ${sub.id}, ShortcutId: ${sub.shortcutId}`);
-      });
-    });
-    
-    console.log('All current subscriptions by shortcut ID:');
-    this.shortcutIdToSubscriptions.forEach((subs, shortcutId) => {
-      console.log(`- ${shortcutId}: ${subs.length} subscriptions`);
-      subs.forEach(sub => {
-        console.log(`  - Subscription ID: ${sub.id}`);
-      });
-    });
+    // Logging removed
   }
 
   /**
@@ -324,7 +300,6 @@ export class EventBus {
       const index = subscriptions.findIndex(sub => sub.id === subscriptionId);
 
       if (index !== -1) {
-        console.log(`Removing subscription "${subscriptionId}" from key combo "${keyCombo}"`);
         // Create a new array without the subscription
         const updatedSubscriptions = [
           ...subscriptions.slice(0, index),
@@ -333,7 +308,6 @@ export class EventBus {
         
         // Update the Map with the new array
         this.subscriptions.set(keyCombo, updatedSubscriptions);
-        console.log(`Updated subscriptions for "${keyCombo}":`, updatedSubscriptions.length);
         found = true;
         // Don't return yet, we need to remove from the shortcut ID map too
       }
@@ -344,7 +318,6 @@ export class EventBus {
       const index = subscriptions.findIndex(sub => sub.id === subscriptionId);
 
       if (index !== -1) {
-        console.log(`Removing subscription "${subscriptionId}" from shortcut "${shortcutId}"`);
         // Create a new array without the subscription
         const updatedSubscriptions = [
           ...subscriptions.slice(0, index),
@@ -353,15 +326,10 @@ export class EventBus {
         
         // Update the Map with the new array
         this.shortcutIdToSubscriptions.set(shortcutId, updatedSubscriptions);
-        console.log(`Updated subscriptions for shortcut "${shortcutId}":`, updatedSubscriptions.length);
         found = true;
         // We found and removed the subscription, so we can break out of the loop
         break;
       }
-    }
-    
-    if (!found) {
-      console.warn(`Subscription "${subscriptionId}" not found`);
     }
   }
 
@@ -373,20 +341,15 @@ export class EventBus {
   private emit(keyCombo: string, event: KeyboardEvent): void {
     const normalizedKeyCombo = normalizeKeyCombo(keyCombo);
 
-    console.log(`Emitting event for key combo: "${normalizedKeyCombo}"`);
-
-    // Debug: Log all current subscriptions
-    this.logSubscriptions();
+    // Debug logging removed
 
     // Get the subscriptions for this key combo
     const subscriptions = [...(this.subscriptions.get(normalizedKeyCombo) || [])];
-    console.log(`Found ${subscriptions.length} direct subscriptions for key combo: "${normalizedKeyCombo}"`);
 
     // If we have subscriptions, execute them
     if (subscriptions.length > 0) {
       // Execute the highest priority subscription
       const subscription = subscriptions[0]; // Already sorted by priority
-      console.log(`Executing callback for subscription: "${subscription.id}" for shortcut: "${subscription.shortcutId}"`);
 
       // Prevent default and stop propagation if configured
       if (this.options.preventDefault) {
@@ -400,7 +363,7 @@ export class EventBus {
         // Execute the callback
         subscription.callback(event);
       } catch (error) {
-        console.error(`Error executing callback for subscription: "${subscription.id}"`, error);
+        // Silent error handling
       }
       return;
     }
@@ -410,19 +373,12 @@ export class EventBus {
       if (config.type === 'sequence') return false;
       
       const shortcutKeyCombo = normalizeKeyCombo(config.keyCombo);
-      const matches = shortcutKeyCombo === normalizedKeyCombo;
-      
-      console.log(`Checking shortcut: ${config.name}, Key Combo: ${config.keyCombo}, Normalized: ${shortcutKeyCombo}, Matches: ${matches}`);
-      
-      return matches;
+      return shortcutKeyCombo === normalizedKeyCombo;
     });
 
     if (matchingShortcuts.length === 0) {
-      console.log(`No shortcuts found for key combo: "${normalizedKeyCombo}"`);
       return;
     }
-
-    console.log(`Found ${matchingShortcuts.length} shortcuts for key combo: "${normalizedKeyCombo}"`);
 
     // Check if any of these shortcuts have subscriptions
     for (const [shortcutId, config] of matchingShortcuts) {
@@ -436,11 +392,8 @@ export class EventBus {
       const shortcutSubscriptions = this.shortcutIdToSubscriptions.get(shortcutId) || [];
       
       if (shortcutSubscriptions.length > 0) {
-        console.log(`Found ${shortcutSubscriptions.length} subscriptions for shortcut "${shortcutId}"`);
-        
         // Execute the highest priority subscription
         const subscription = shortcutSubscriptions[0]; // Already sorted by priority
-        console.log(`Executing callback for subscription: "${subscription.id}" for shortcut: "${shortcutId}"`);
         
         // Prevent default and stop propagation if configured
         if (this.options.preventDefault) {
@@ -455,14 +408,12 @@ export class EventBus {
           subscription.callback(event);
           return; // We've handled the event, so we can return
         } catch (error) {
-          console.error(`Error executing callback for subscription: "${subscription.id}"`, error);
+          // Silent error handling
         }
       }
       
       // If no subscriptions but there's a default action, execute it
       if (config.action) {
-        console.log(`Executing default action for shortcut: "${shortcutId}"`);
-        
         // Prevent default and stop propagation if configured
         if (this.options.preventDefault) {
           event.preventDefault();
@@ -475,7 +426,7 @@ export class EventBus {
           config.action(event);
           return; // We've handled the event, so we can return
         } catch (error) {
-          console.error(`Error executing default action for shortcut: "${shortcutId}"`, error);
+          // Silent error handling
         }
       }
     }
@@ -488,7 +439,6 @@ export class EventBus {
    */
   public updateShortcut(shortcutId: string, config: Partial<ShortcutConfig>): void {
     if (!this.shortcuts[shortcutId]) {
-      console.warn(`Shortcut "${shortcutId}" is not defined`);
       return;
     }
 
@@ -513,10 +463,6 @@ export class EventBus {
    * @param config The shortcut configuration
    */
   public registerShortcut(shortcutId: string, config: ShortcutConfig): void {
-    if (this.shortcuts[shortcutId]) {
-      console.warn(`Shortcut "${shortcutId}" is already defined and will be overwritten`);
-    }
-
     this.shortcuts[shortcutId] = config;
   }
 
@@ -526,7 +472,6 @@ export class EventBus {
    */
   public unregisterShortcut(shortcutId: string): void {
     if (!this.shortcuts[shortcutId]) {
-      console.warn(`Shortcut "${shortcutId}" is not defined`);
       return;
     }
 
