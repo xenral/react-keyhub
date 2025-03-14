@@ -1,6 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { ShortcutSheetProps, ShortcutSettings, ShortcutScope, ShortcutConfig, ShortcutContext } from './types';
-import { useShortcutSheet, useShortcutGroups } from './KeyHubContext';
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  ShortcutSheetProps,
+  ShortcutSettings,
+  ShortcutScope,
+  ShortcutConfig,
+  ShortcutContext,
+} from "./types";
+import { useShortcutSheet, useShortcutGroups } from "./KeyHubContext";
 
 /**
  * Formats a key combination for display
@@ -9,30 +15,30 @@ import { useShortcutSheet, useShortcutGroups } from './KeyHubContext';
  */
 const formatKeyCombo = (keyCombo: string): string => {
   return keyCombo
-    .split('+')
-    .map(key => {
+    .split("+")
+    .map((key) => {
       // Capitalize the first letter of each key
       const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-      
+
       // Replace common key names with symbols or better names
       switch (key.toLowerCase()) {
-        case 'ctrl':
-          return 'Ctrl';
-        case 'alt':
-          return 'Alt';
-        case 'shift':
-          return 'Shift';
-        case 'meta':
-          return navigator.platform.includes('Mac') ? '⌘' : 'Win';
-        case 'esc':
-          return 'Esc';
-        case 'space':
-          return 'Space';
+        case "ctrl":
+          return "Ctrl";
+        case "alt":
+          return "Alt";
+        case "shift":
+          return "Shift";
+        case "meta":
+          return navigator.platform.includes("Mac") ? "⌘" : "Win";
+        case "esc":
+          return "Esc";
+        case "space":
+          return "Space";
         default:
           return formattedKey;
       }
     })
-    .join(' + ');
+    .join(" + ");
 };
 
 /**
@@ -42,46 +48,48 @@ const formatKeyCombo = (keyCombo: string): string => {
  */
 const formatSequence = (sequence: string): string => {
   return sequence
-    .split(' ')
-    .map(keyCombo => formatKeyCombo(keyCombo))
-    .join(' then ');
+    .split(" ")
+    .map((keyCombo) => formatKeyCombo(keyCombo))
+    .join(" then ");
 };
 
 /**
  * Renders a keyboard key
  */
 const KeyboardKey: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <kbd className="keyhub-shortcut-sheet-key">
-      {children}
-    </kbd>
-  );
+  return <kbd className="keyhub-shortcut-sheet-key">{children}</kbd>;
 };
 
 /**
  * Renders a shortcut key combination
  */
-const ShortcutKeyCombo: React.FC<{ shortcut: ShortcutConfig }> = ({ shortcut }) => {
-  if (shortcut.type === 'sequence') {
-    const parts = shortcut.sequence.split(' ');
+const ShortcutKeyCombo: React.FC<{ shortcut: ShortcutConfig }> = ({
+  shortcut,
+}) => {
+  if (shortcut.type === "sequence") {
+    const parts = shortcut.sequence.split(" ");
     return (
       <div className="keyhub-shortcut-sheet-key-combo">
         {parts.map((part, index) => (
           <React.Fragment key={index}>
-            {index > 0 && <span className="keyhub-shortcut-sheet-key-then">then</span>}
+            {index > 0 && (
+              <span className="keyhub-shortcut-sheet-key-then">then</span>
+            )}
             <KeyboardKey>{formatKeyCombo(part)}</KeyboardKey>
           </React.Fragment>
         ))}
       </div>
     );
   }
-  
-  const parts = shortcut.keyCombo.split('+');
+
+  const parts = shortcut.keyCombo.split("+");
   return (
     <div className="keyhub-shortcut-sheet-key-combo">
       {parts.map((part, index) => (
         <React.Fragment key={index}>
-          {index > 0 && <span className="keyhub-shortcut-sheet-key-plus">+</span>}
+          {index > 0 && (
+            <span className="keyhub-shortcut-sheet-key-plus">+</span>
+          )}
           <KeyboardKey>{formatKeyCombo(part)}</KeyboardKey>
         </React.Fragment>
       ))}
@@ -96,55 +104,57 @@ export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({
   isOpen,
   onClose,
   filter = {},
-  className = '',
-  theme = 'light',
-  layout = 'modal',
+  className = "",
+  theme = "light",
+  layout = "modal",
 }) => {
   const shortcuts = useShortcutSheet();
   const groups = useShortcutGroups();
-  const [searchTerm, setSearchTerm] = useState(filter.search || '');
-  const [scopeFilter, setScopeFilter] = useState<ShortcutScope | 'all'>(
-    filter.scope || 'all'
+  const [searchTerm, setSearchTerm] = useState(filter.search || "");
+  const [scopeFilter, setScopeFilter] = useState<ShortcutScope | "all">(
+    filter.scope || "all"
   );
-  const [groupFilter, setGroupFilter] = useState<string | 'all'>(
-    filter.group || 'all'
+  const [groupFilter, setGroupFilter] = useState<string | "all">(
+    filter.group || "all"
   );
-  const [contextFilter, setContextFilter] = useState<ShortcutContext | 'all'>(
-    filter.context || 'all'
+  const [contextFilter, setContextFilter] = useState<ShortcutContext | "all">(
+    filter.context || "all"
   );
-  const [activeTab, setActiveTab] = useState<string>(groups[0] || 'all');
-  
+  const [activeTab, setActiveTab] = useState<string>(groups[0] || "all");
+
   // Detect system theme
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light');
-  
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+
   useEffect(() => {
-    if (theme === 'auto') {
-      const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setSystemTheme(isDarkMode ? 'dark' : 'light');
-      
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if (theme === "auto") {
+      const isDarkMode =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setSystemTheme(isDarkMode ? "dark" : "light");
+
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
       const handler = (e: MediaQueryListEvent) => {
-        setSystemTheme(e.matches ? 'dark' : 'light');
+        setSystemTheme(e.matches ? "dark" : "light");
       };
-      
-      mediaQuery.addEventListener('change', handler);
-      return () => mediaQuery.removeEventListener('change', handler);
+
+      mediaQuery.addEventListener("change", handler);
+      return () => mediaQuery.removeEventListener("change", handler);
     }
   }, [theme]);
-  
+
   // Get the effective theme
-  const effectiveTheme = theme === 'auto' ? systemTheme : theme;
-  
+  const effectiveTheme = theme === "auto" ? systemTheme : theme;
+
   // Get all unique contexts
   const contexts = useMemo(() => {
     const contextSet = new Set<ShortcutContext>();
-    
-    Object.values(shortcuts).forEach(config => {
+
+    Object.values(shortcuts).forEach((config) => {
       if (config.context) {
         contextSet.add(config.context);
       }
     });
-    
+
     return Array.from(contextSet);
   }, [shortcuts]);
 
@@ -152,49 +162,58 @@ export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({
   const filteredShortcuts = useMemo(() => {
     return Object.entries(shortcuts).filter(([id, shortcut]) => {
       // Filter by scope
-      if (scopeFilter !== 'all' && shortcut.scope !== scopeFilter) {
+      if (scopeFilter !== "all" && shortcut.scope !== scopeFilter) {
         return false;
       }
-      
+
       // Filter by group
-      if (groupFilter !== 'all' && shortcut.group !== groupFilter) {
+      if (groupFilter !== "all" && shortcut.group !== groupFilter) {
         return false;
       }
-      
+
       // Filter by context
-      if (contextFilter !== 'all' && shortcut.context !== contextFilter) {
+      if (contextFilter !== "all" && shortcut.context !== contextFilter) {
         return false;
       }
-      
+
       // Filter by active tab (group)
-      if (activeTab !== 'all' && shortcut.group !== activeTab) {
+      if (activeTab !== "all" && shortcut.group !== activeTab) {
         return false;
       }
-      
+
       // Filter by search term
       const searchLower = searchTerm.toLowerCase();
       return (
-        searchTerm === '' ||
+        searchTerm === "" ||
         shortcut.name.toLowerCase().includes(searchLower) ||
         shortcut.description.toLowerCase().includes(searchLower) ||
-        (shortcut.type === 'regular' && shortcut.keyCombo.toLowerCase().includes(searchLower)) ||
-        (shortcut.type === 'sequence' && shortcut.sequence.toLowerCase().includes(searchLower))
+        (shortcut.type === "regular" &&
+          shortcut.keyCombo.toLowerCase().includes(searchLower)) ||
+        (shortcut.type === "sequence" &&
+          shortcut.sequence.toLowerCase().includes(searchLower))
       );
     });
-  }, [shortcuts, searchTerm, scopeFilter, groupFilter, contextFilter, activeTab]);
-  
+  }, [
+    shortcuts,
+    searchTerm,
+    scopeFilter,
+    groupFilter,
+    contextFilter,
+    activeTab,
+  ]);
+
   // Group shortcuts by group
   const shortcutsByGroup = useMemo(() => {
     const grouped: Record<string, [string, ShortcutConfig][]> = {};
-    
-    filteredShortcuts.forEach(entry => {
-      const group = entry[1].group || 'Ungrouped';
+
+    filteredShortcuts.forEach((entry) => {
+      const group = entry[1].group || "Ungrouped";
       if (!grouped[group]) {
         grouped[group] = [];
       }
       grouped[group].push(entry);
     });
-    
+
     return grouped;
   }, [filteredShortcuts]);
 
@@ -204,16 +223,22 @@ export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({
   }
 
   return (
-    <div className={`keyhub-shortcut-sheet keyhub-theme-${effectiveTheme} keyhub-layout-${layout} ${className}`}>
+    <div
+      className={`keyhub-shortcut-sheet keyhub-theme-${effectiveTheme} keyhub-layout-${layout} ${className}`}
+    >
       <div className="keyhub-shortcut-sheet-overlay" onClick={onClose} />
       <div className="keyhub-shortcut-sheet-content">
         <div className="keyhub-shortcut-sheet-header">
           <h2>Keyboard Shortcuts</h2>
-          <button className="keyhub-shortcut-sheet-close" onClick={onClose} aria-label="Close">
+          <button
+            className="keyhub-shortcut-sheet-close"
+            onClick={onClose}
+            aria-label="Close"
+          >
             &times;
           </button>
         </div>
-        
+
         <div className="keyhub-shortcut-sheet-filters">
           <div className="keyhub-shortcut-sheet-search-container">
             <input
@@ -224,20 +249,22 @@ export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({
               className="keyhub-shortcut-sheet-search"
             />
             {searchTerm && (
-              <button 
-                className="keyhub-shortcut-sheet-search-clear" 
-                onClick={() => setSearchTerm('')}
+              <button
+                className="keyhub-shortcut-sheet-search-clear"
+                onClick={() => setSearchTerm("")}
                 aria-label="Clear search"
               >
                 &times;
               </button>
             )}
           </div>
-          
+
           <div className="keyhub-shortcut-sheet-filter-controls">
             <select
               value={scopeFilter}
-              onChange={(e) => setScopeFilter(e.target.value as ShortcutScope | 'all')}
+              onChange={(e) =>
+                setScopeFilter(e.target.value as ShortcutScope | "all")
+              }
               className="keyhub-shortcut-sheet-scope"
               aria-label="Filter by scope"
             >
@@ -245,35 +272,43 @@ export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({
               <option value="global">Global</option>
               <option value="local">Local</option>
             </select>
-            
+
             {contexts.length > 0 && (
               <select
                 value={contextFilter}
-                onChange={(e) => setContextFilter(e.target.value as ShortcutContext | 'all')}
+                onChange={(e) =>
+                  setContextFilter(e.target.value as ShortcutContext | "all")
+                }
                 className="keyhub-shortcut-sheet-context"
                 aria-label="Filter by context"
               >
                 <option value="all">All Contexts</option>
-                {contexts.map(context => (
-                  <option key={context} value={context}>{context}</option>
+                {contexts.map((context) => (
+                  <option key={context} value={context}>
+                    {context}
+                  </option>
                 ))}
               </select>
             )}
           </div>
         </div>
-        
+
         {groups.length > 0 && (
           <div className="keyhub-shortcut-sheet-tabs">
-            <button 
-              className={`keyhub-shortcut-sheet-tab ${activeTab === 'all' ? 'active' : ''}`}
-              onClick={() => setActiveTab('all')}
+            <button
+              className={`keyhub-shortcut-sheet-tab ${
+                activeTab === "all" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("all")}
             >
               All
             </button>
-            {groups.map(group => (
-              <button 
-                key={group} 
-                className={`keyhub-shortcut-sheet-tab ${activeTab === group ? 'active' : ''}`}
+            {groups.map((group) => (
+              <button
+                key={group}
+                className={`keyhub-shortcut-sheet-tab ${
+                  activeTab === group ? "active" : ""
+                }`}
                 onClick={() => setActiveTab(group)}
               >
                 {group}
@@ -281,7 +316,7 @@ export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({
             ))}
           </div>
         )}
-        
+
         <div className="keyhub-shortcut-sheet-list">
           {Object.keys(shortcutsByGroup).length === 0 ? (
             <div className="keyhub-shortcut-sheet-empty">
@@ -294,14 +329,18 @@ export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({
                   <h3 className="keyhub-shortcut-sheet-group-title">{group}</h3>
                   <div className="keyhub-shortcut-sheet-cards">
                     {shortcuts.map(([id, shortcut]) => (
-                      <div 
-                        key={id} 
+                      <div
+                        key={id}
                         className={`keyhub-shortcut-sheet-card keyhub-shortcut-${shortcut.status}`}
                       >
                         <div className="keyhub-shortcut-sheet-card-header">
-                          <h4 className="keyhub-shortcut-sheet-card-title">{shortcut.name}</h4>
+                          <h4 className="keyhub-shortcut-sheet-card-title">
+                            {shortcut.name}
+                          </h4>
                           {shortcut.context && (
-                            <span className="keyhub-shortcut-sheet-card-context">{shortcut.context}</span>
+                            <span className="keyhub-shortcut-sheet-card-context">
+                              {shortcut.context}
+                            </span>
                           )}
                         </div>
                         <div className="keyhub-shortcut-sheet-card-description">
@@ -309,7 +348,9 @@ export const ShortcutSheet: React.FC<ShortcutSheetProps> = ({
                         </div>
                         <div className="keyhub-shortcut-sheet-card-footer">
                           <ShortcutKeyCombo shortcut={shortcut} />
-                          <span className="keyhub-shortcut-sheet-card-scope">{shortcut.scope}</span>
+                          <span className="keyhub-shortcut-sheet-card-scope">
+                            {shortcut.scope}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -418,24 +459,6 @@ export const ShortcutSheetStyles = `
   }
 }
 
-/* Inline layout */
-.keyhub-layout-inline .keyhub-shortcut-sheet {
-  position: relative;
-  z-index: 1;
-}
-
-.keyhub-layout-inline .keyhub-shortcut-sheet-overlay {
-  display: none;
-}
-
-.keyhub-layout-inline .keyhub-shortcut-sheet-content {
-  width: 100%;
-  max-width: 100%;
-  max-height: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
 .keyhub-shortcut-sheet-header {
   display: flex;
   align-items: center;
@@ -461,7 +484,7 @@ export const ShortcutSheetStyles = `
 .keyhub-shortcut-sheet-close {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 22px;
   cursor: pointer;
   width: 36px;
   height: 36px;
@@ -470,6 +493,7 @@ export const ShortcutSheetStyles = `
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s;
+  padding:0px;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-close {
@@ -633,6 +657,7 @@ export const ShortcutSheetStyles = `
   border-bottom: 1px solid;
   scrollbar-width: thin;
   background-color: transparent;
+  min-height: 45px;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-tabs {
@@ -653,6 +678,7 @@ export const ShortcutSheetStyles = `
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
+  border-radius:0px;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-tab {
@@ -746,7 +772,6 @@ export const ShortcutSheetStyles = `
   gap: 10px;
   border: 1px solid;
   transition: all 0.2s;
-  height: 100%;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-card {
@@ -976,4 +1001,4 @@ export const ShortcutSheetStyles = `
     align-items: flex-start;
   }
 }
-`; 
+`;

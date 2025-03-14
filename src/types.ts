@@ -231,5 +231,5 @@ export interface ShortcutSheetProps {
   /**
    * Optional layout for the shortcut sheet
    */
-  layout?: 'modal' | 'sidebar' | 'inline';
+  layout?: 'modal' | 'sidebar';
 } 

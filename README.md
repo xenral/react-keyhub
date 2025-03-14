@@ -19,7 +19,7 @@ A lightweight, scalable keyboard shortcut manager for React applications with Ty
 - 🌐 **Context Awareness**: Define shortcuts that only work in specific contexts
 - 🔢 **Sequence Support**: Create shortcuts that require a sequence of key presses
 - 🎨 **Theming Support**: Light, dark, and auto themes for the shortcut sheet
-- 📱 **Responsive Layouts**: Modal, sidebar, and inline layouts for the shortcut sheet
+- 📱 **Responsive Layouts**: Modal and sidebar layouts for the shortcut sheet
 - 💡 **Type Suggestions**: Enhanced hooks with autocomplete for registered shortcuts
 
 ## Installation
@@ -374,30 +374,29 @@ A component to display all registered shortcuts.
 <ShortcutSheet 
   isOpen={isOpen} 
   onClose={handleClose} 
+  theme="light" // 'light', 'dark', or 'auto'
+  layout="modal" // 'modal' or 'sidebar'
   filter={{ 
     scope: 'global',
     search: 'save',
     group: 'File',
     context: 'editor'
   }}
-  className="custom-class"
-  theme="dark" // 'light', 'dark', or 'auto'
-  layout="modal" // 'modal', 'sidebar', or 'inline'
 />
 ```
 
 #### Props
 
-- `isOpen`: Whether the shortcut sheet is open
+- `isOpen`: Whether to show the shortcut sheet
 - `onClose`: Callback to close the shortcut sheet
-- `filter` (optional):
-  - `scope`: Filter shortcuts by scope (`'global'`, `'local'`, or `undefined`)
-  - `search`: Filter shortcuts by search term
-  - `group`: Filter shortcuts by group
-  - `context`: Filter shortcuts by context
-- `className` (optional): Custom class name for the shortcut sheet
 - `theme` (optional): Theme for the shortcut sheet (`'light'`, `'dark'`, or `'auto'`)
-- `layout` (optional): Layout for the shortcut sheet (`'modal'`, `'sidebar'`, or `'inline'`)
+- `layout` (optional): Layout for the shortcut sheet (`'modal'` or `'sidebar'`)
+- `filter` (optional): Filter for the shortcuts to display
+  - `scope` (optional): Filter by scope (`'global'` or `'local'`)
+  - `search` (optional): Filter by search term
+  - `group` (optional): Filter by group
+  - `context` (optional): Filter by context
+- `className` (optional): Custom class name for the shortcut sheet
 
 ### `ShortcutSheetStyles`
 
@@ -653,44 +652,6 @@ function MyComponent() {
   );
 }
 ```
-
-### Different Layouts
-
-```tsx
-function MyComponent() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [layout, setLayout] = useState<'modal' | 'sidebar' | 'inline'>('modal');
-  
-  return (
-    <div>
-      <button onClick={() => setIsOpen(true)}>Show Shortcuts</button>
-      
-      <select value={layout} onChange={(e) => setLayout(e.target.value as any)}>
-        <option value="modal">Modal</option>
-        <option value="sidebar">Sidebar</option>
-        <option value="inline">Inline</option>
-      </select>
-      
-      {layout === 'inline' && isOpen ? (
-        <div className="inline-container">
-          <ShortcutSheet 
-            isOpen={true} 
-            onClose={() => setIsOpen(false)} 
-            layout="inline"
-          />
-        </div>
-      ) : (
-        <ShortcutSheet 
-          isOpen={isOpen} 
-          onClose={() => setIsOpen(false)} 
-          layout={layout}
-        />
-      )}
-    </div>
-  );
-}
-```
-
 
 ## Browser Support
 
