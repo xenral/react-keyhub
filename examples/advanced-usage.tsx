@@ -13,30 +13,31 @@ import {
   useShortcutPause,
   ShortcutRegular,
   ShortcutScope,
-  ShortcutStatus
+  ShortcutStatus,
+  ShortcutType
 } from '../src';
-import { ShortcutConfig } from '../src/types';
+import { ShortcutConfig, ShortcutSettings } from '../src/types';
 
 // Define custom shortcuts by extending the default ones
-const myShortcuts = {
+const myShortcuts: ShortcutSettings = {
   ...defaultShortcuts,
   // Add a custom shortcut
   customAction: {
     keyCombo: 'ctrl+k',
     name: 'Custom Action',
     description: 'Perform a custom action',
-    scope: 'global' as ShortcutScope,
+    scope: ShortcutScope.GLOBAL,
     priority: 100,
-    status: 'enabled' as ShortcutStatus,
+    status: ShortcutStatus.ENABLED,
     group: 'Custom',
-    type: 'regular' as const
+    type: ShortcutType.REGULAR
   }
 };
 
 // Main App component
 export const AdvancedApp: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark' | 'auto'>('auto');
-  const [layout, setLayout] = useState<'modal' | 'sidebar' | 'inline'>('modal');
+  const [layout, setLayout] = useState<'modal' | 'sidebar'>('modal');
   
   return (
     <KeyHubProvider shortcuts={myShortcuts}>
@@ -64,20 +65,14 @@ export const AdvancedApp: React.FC = () => {
               >
                 <option value="modal">Modal</option>
                 <option value="sidebar">Sidebar</option>
-                <option value="inline">Inline</option>
               </select>
             </div>
           </div>
         </header>
-        
-        <main className="app-main">
+        <main className="app-content">
           <EditorSection theme={theme} layout={layout} />
           <ShortcutManagerSection />
         </main>
-        
-        <footer className="app-footer">
-          <p>Press <kbd>Ctrl</kbd> + <kbd>/</kbd> to show all shortcuts</p>
-        </footer>
       </div>
       
       <style>{`
@@ -147,7 +142,7 @@ export const AdvancedApp: React.FC = () => {
           gap: 8px;
         }
         
-        .app-main {
+        .app-content {
           flex: 1;
           display: grid;
           grid-template-columns: 1fr 300px;
@@ -156,7 +151,7 @@ export const AdvancedApp: React.FC = () => {
         }
         
         @media (max-width: 768px) {
-          .app-main {
+          .app-content {
             grid-template-columns: 1fr;
           }
         }
@@ -443,7 +438,7 @@ export const AdvancedApp: React.FC = () => {
 // Editor section component
 interface EditorSectionProps {
   theme: 'light' | 'dark' | 'auto';
-  layout: 'modal' | 'sidebar' | 'inline';
+  layout: 'modal' | 'sidebar';
 }
 
 const EditorSection: React.FC<EditorSectionProps> = ({ theme, layout }) => {
@@ -511,11 +506,11 @@ const EditorSection: React.FC<EditorSectionProps> = ({ theme, layout }) => {
     keyCombo: 'ctrl+d',
     name: 'Dynamic Shortcut',
     description: 'A dynamically registered shortcut',
-    scope: 'local' as ShortcutScope,
+    scope: ShortcutScope.LOCAL,
     priority: 100,
-    status: 'enabled' as ShortcutStatus,
+    status: ShortcutStatus.ENABLED,
     group: 'Dynamic',
-    type: 'regular' as const,
+    type: ShortcutType.REGULAR,
     action: () => {
       showMessage('info', 'Dynamic shortcut triggered!');
     }
@@ -565,35 +560,24 @@ const EditorSection: React.FC<EditorSectionProps> = ({ theme, layout }) => {
           </div>
         )}
         
-        <div className="button-group">
-          <button onClick={() => showMessage('success', 'Document saved!')}>
-            Save
-          </button>
-          <button className="secondary" onClick={() => setIsShortcutSheetOpen(true)}>
-            Show Shortcuts
-          </button>
+        <div className="editor-actions">
+          <div className="action-buttons">
+            <button className="primary" onClick={() => showMessage('success', 'Document saved!')}>
+              Save
+            </button>
+            <button className="secondary" onClick={() => setIsShortcutSheetOpen(true)}>
+              Show Shortcuts
+            </button>
+          </div>
         </div>
       </div>
       
-      {layout === 'inline' && isShortcutSheetOpen && (
-        <div className="card">
-          <ShortcutSheet 
-            isOpen={true} 
-            onClose={() => setIsShortcutSheetOpen(false)} 
-            theme={theme}
-            layout="inline"
-          />
-        </div>
-      )}
-      
-      {layout !== 'inline' && (
-        <ShortcutSheet 
-          isOpen={isShortcutSheetOpen} 
-          onClose={() => setIsShortcutSheetOpen(false)} 
-          theme={theme}
-          layout={layout}
-        />
-      )}
+      <ShortcutSheet 
+        isOpen={isShortcutSheetOpen} 
+        onClose={() => setIsShortcutSheetOpen(false)} 
+        theme={theme}
+        layout={layout}
+      />
     </div>
   );
 };
@@ -621,11 +605,11 @@ const ShortcutManagerSection: React.FC = () => {
       keyCombo: customShortcutKey,
       name: customShortcutName,
       description: customShortcutDesc,
-      scope: 'global' as ShortcutScope,
+      scope: ShortcutScope.GLOBAL,
       priority: 100,
-      status: 'enabled' as ShortcutStatus,
+      status: ShortcutStatus.ENABLED,
       group: customShortcutGroup,
-      type: 'regular' as const
+      type: ShortcutType.REGULAR
     };
     
     useShortcutRegister(shortcutId, shortcutConfig);
