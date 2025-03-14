@@ -347,20 +347,34 @@ export const ShortcutSheetStyles = `
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  transition: opacity 0.2s ease;
 }
 
 .keyhub-shortcut-sheet-content {
   position: relative;
-  border-radius: 8px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   width: 90%;
-  max-width: 900px;
+  max-width: 1000px;
   max-height: 85vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  animation: keyhub-sheet-appear 0.2s ease;
+  transition: transform 0.2s ease;
+}
+
+@keyframes keyhub-sheet-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Light theme */
@@ -378,7 +392,7 @@ export const ShortcutSheetStyles = `
 /* Modal layout */
 .keyhub-layout-modal .keyhub-shortcut-sheet-content {
   width: 90%;
-  max-width: 900px;
+  max-width: 1000px;
 }
 
 /* Sidebar layout */
@@ -387,11 +401,21 @@ export const ShortcutSheetStyles = `
   top: 0;
   right: 0;
   bottom: 0;
-  width: 400px;
+  width: 450px;
   max-width: 90%;
   border-radius: 0;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  animation: keyhub-sheet-slide-in 0.3s ease;
+}
+
+@keyframes keyhub-sheet-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 /* Inline layout */
@@ -408,14 +432,15 @@ export const ShortcutSheetStyles = `
   width: 100%;
   max-width: 100%;
   max-height: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
 .keyhub-shortcut-sheet-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
+  padding: 20px 24px;
   border-bottom: 1px solid;
 }
 
@@ -429,7 +454,7 @@ export const ShortcutSheetStyles = `
 
 .keyhub-shortcut-sheet-header h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
 }
 
@@ -438,13 +463,13 @@ export const ShortcutSheetStyles = `
   border: none;
   font-size: 24px;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-close {
@@ -453,6 +478,7 @@ export const ShortcutSheetStyles = `
 
 .keyhub-theme-light .keyhub-shortcut-sheet-close:hover {
   background-color: #f0f0f0;
+  color: #333;
 }
 
 .keyhub-theme-dark .keyhub-shortcut-sheet-close {
@@ -461,6 +487,7 @@ export const ShortcutSheetStyles = `
 
 .keyhub-theme-dark .keyhub-shortcut-sheet-close:hover {
   background-color: #333;
+  color: #fff;
 }
 
 .keyhub-shortcut-sheet-filters {
@@ -473,10 +500,12 @@ export const ShortcutSheetStyles = `
 
 .keyhub-theme-light .keyhub-shortcut-sheet-filters {
   border-color: #eee;
+  background-color: #fafafa;
 }
 
 .keyhub-theme-dark .keyhub-shortcut-sheet-filters {
   border-color: #333;
+  background-color: #252525;
 }
 
 .keyhub-shortcut-sheet-search-container {
@@ -486,10 +515,11 @@ export const ShortcutSheetStyles = `
 
 .keyhub-shortcut-sheet-search {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 15px;
   border: 1px solid;
+  transition: all 0.2s;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-search {
@@ -498,15 +528,25 @@ export const ShortcutSheetStyles = `
   color: #333;
 }
 
+.keyhub-theme-light .keyhub-shortcut-sheet-search:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+}
+
 .keyhub-theme-dark .keyhub-shortcut-sheet-search {
   border-color: #444;
-  background-color: #252525;
+  background-color: #2a2a2a;
   color: #eee;
+}
+
+.keyhub-theme-dark .keyhub-shortcut-sheet-search:focus {
+  border-color: #4da3ff;
+  box-shadow: 0 0 0 2px rgba(77, 163, 255, 0.2);
 }
 
 .keyhub-shortcut-sheet-search-clear {
   position: absolute;
-  right: 8px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -519,14 +559,25 @@ export const ShortcutSheetStyles = `
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  transition: all 0.2s;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-search-clear {
   color: #999;
 }
 
+.keyhub-theme-light .keyhub-shortcut-sheet-search-clear:hover {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
 .keyhub-theme-dark .keyhub-shortcut-sheet-search-clear {
   color: #777;
+}
+
+.keyhub-theme-dark .keyhub-shortcut-sheet-search-clear:hover {
+  background-color: #444;
+  color: #aaa;
 }
 
 .keyhub-shortcut-sheet-filter-controls {
@@ -536,10 +587,17 @@ export const ShortcutSheetStyles = `
 
 .keyhub-shortcut-sheet-scope,
 .keyhub-shortcut-sheet-context {
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
   font-size: 14px;
   border: 1px solid;
+  transition: all 0.2s;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-scope,
@@ -549,11 +607,23 @@ export const ShortcutSheetStyles = `
   color: #333;
 }
 
+.keyhub-theme-light .keyhub-shortcut-sheet-scope:focus,
+.keyhub-theme-light .keyhub-shortcut-sheet-context:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+}
+
 .keyhub-theme-dark .keyhub-shortcut-sheet-scope,
 .keyhub-theme-dark .keyhub-shortcut-sheet-context {
   border-color: #444;
-  background-color: #252525;
+  background-color: #2a2a2a;
   color: #eee;
+}
+
+.keyhub-theme-dark .keyhub-shortcut-sheet-scope:focus,
+.keyhub-theme-dark .keyhub-shortcut-sheet-context:focus {
+  border-color: #4da3ff;
+  box-shadow: 0 0 0 2px rgba(77, 163, 255, 0.2);
 }
 
 .keyhub-shortcut-sheet-tabs {
@@ -562,6 +632,7 @@ export const ShortcutSheetStyles = `
   padding: 0 24px;
   border-bottom: 1px solid;
   scrollbar-width: thin;
+  background-color: transparent;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-tabs {
@@ -573,7 +644,7 @@ export const ShortcutSheetStyles = `
 }
 
 .keyhub-shortcut-sheet-tab {
-  padding: 12px 16px;
+  padding: 14px 18px;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
@@ -581,14 +652,25 @@ export const ShortcutSheetStyles = `
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-tab {
   color: #666;
 }
 
+.keyhub-theme-light .keyhub-shortcut-sheet-tab:hover:not(.active) {
+  color: #333;
+  background-color: #f5f5f5;
+}
+
 .keyhub-theme-dark .keyhub-shortcut-sheet-tab {
   color: #aaa;
+}
+
+.keyhub-theme-dark .keyhub-shortcut-sheet-tab:hover:not(.active) {
+  color: #eee;
+  background-color: #333;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-tab.active {
@@ -604,48 +686,67 @@ export const ShortcutSheetStyles = `
 .keyhub-shortcut-sheet-list {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 24px;
+  padding: 20px 24px;
 }
 
 .keyhub-shortcut-sheet-empty {
-  padding: 24px;
+  padding: 40px 24px;
   text-align: center;
   color: #999;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.keyhub-shortcut-sheet-empty:before {
+  content: "🔍";
+  font-size: 32px;
+  opacity: 0.7;
 }
 
 .keyhub-shortcut-sheet-groups {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
 }
 
 .keyhub-shortcut-sheet-group-title {
-  margin: 0 0 12px 0;
-  font-size: 16px;
+  margin: 0 0 16px 0;
+  font-size: 18px;
   font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 1px solid;
+  display: flex;
+  align-items: center;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-group-title {
-  color: #555;
+  color: #444;
+  border-color: #eee;
 }
 
 .keyhub-theme-dark .keyhub-shortcut-sheet-group-title {
-  color: #ccc;
+  color: #ddd;
+  border-color: #333;
 }
 
 .keyhub-shortcut-sheet-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
 }
 
 .keyhub-shortcut-sheet-card {
-  border-radius: 6px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   border: 1px solid;
+  transition: all 0.2s;
+  height: 100%;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-card {
@@ -653,27 +754,44 @@ export const ShortcutSheetStyles = `
   background-color: #f9f9f9;
 }
 
+.keyhub-theme-light .keyhub-shortcut-sheet-card:hover {
+  border-color: #ddd;
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
 .keyhub-theme-dark .keyhub-shortcut-sheet-card {
   border-color: #333;
   background-color: #252525;
 }
 
+.keyhub-theme-dark .keyhub-shortcut-sheet-card:hover {
+  border-color: #444;
+  background-color: #2a2a2a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
 .keyhub-shortcut-sheet-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .keyhub-shortcut-sheet-card-title {
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .keyhub-shortcut-sheet-card-context {
   font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-card-context {
@@ -687,8 +805,9 @@ export const ShortcutSheetStyles = `
 }
 
 .keyhub-shortcut-sheet-card-description {
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.5;
+  flex-grow: 1;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-card-description {
@@ -704,12 +823,14 @@ export const ShortcutSheetStyles = `
   justify-content: space-between;
   align-items: center;
   margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .keyhub-shortcut-sheet-card-scope {
   font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
   text-transform: capitalize;
 }
 
@@ -726,36 +847,41 @@ export const ShortcutSheetStyles = `
 .keyhub-shortcut-sheet-key-combo {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .keyhub-shortcut-sheet-key {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  padding: 3px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  min-width: 20px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  min-width: 24px;
   text-align: center;
   border: 1px solid;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-key {
-  background-color: #f0f0f0;
+  background-color: white;
   border-color: #ddd;
   color: #333;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(0, 0, 0, 0.05);
 }
 
 .keyhub-theme-dark .keyhub-shortcut-sheet-key {
   background-color: #333;
   border-color: #444;
   color: #eee;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2), 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 
 .keyhub-shortcut-sheet-key-plus,
 .keyhub-shortcut-sheet-key-then {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .keyhub-theme-light .keyhub-shortcut-sheet-key-plus,
@@ -769,7 +895,46 @@ export const ShortcutSheetStyles = `
 }
 
 .keyhub-shortcut-disabled {
-  opacity: 0.5;
+  opacity: 0.6;
+}
+
+/* Scrollbar styling */
+.keyhub-shortcut-sheet-list::-webkit-scrollbar,
+.keyhub-shortcut-sheet-tabs::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.keyhub-theme-light .keyhub-shortcut-sheet-list::-webkit-scrollbar-track,
+.keyhub-theme-light .keyhub-shortcut-sheet-tabs::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.keyhub-theme-light .keyhub-shortcut-sheet-list::-webkit-scrollbar-thumb,
+.keyhub-theme-light .keyhub-shortcut-sheet-tabs::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.keyhub-theme-light .keyhub-shortcut-sheet-list::-webkit-scrollbar-thumb:hover,
+.keyhub-theme-light .keyhub-shortcut-sheet-tabs::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+.keyhub-theme-dark .keyhub-shortcut-sheet-list::-webkit-scrollbar-track,
+.keyhub-theme-dark .keyhub-shortcut-sheet-tabs::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.keyhub-theme-dark .keyhub-shortcut-sheet-list::-webkit-scrollbar-thumb,
+.keyhub-theme-dark .keyhub-shortcut-sheet-tabs::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+.keyhub-theme-dark .keyhub-shortcut-sheet-list::-webkit-scrollbar-thumb:hover,
+.keyhub-theme-dark .keyhub-shortcut-sheet-tabs::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 /* Responsive adjustments */
@@ -786,6 +951,29 @@ export const ShortcutSheetStyles = `
     width: 100%;
     max-width: 100%;
     border-radius: 0;
+  }
+  
+  .keyhub-shortcut-sheet-header {
+    padding: 16px 20px;
+  }
+  
+  .keyhub-shortcut-sheet-list {
+    padding: 16px 20px;
+  }
+  
+  .keyhub-shortcut-sheet-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .keyhub-shortcut-sheet-header h2 {
+    font-size: 18px;
+  }
+  
+  .keyhub-shortcut-sheet-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 `; 

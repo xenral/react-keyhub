@@ -24,7 +24,6 @@ export type AvailableShortcuts = keyof ProviderShortcuts;
  *   console.log('Save triggered!');
  * });
  */
-
 export function useShortcut<T extends AvailableShortcuts>(
   shortcutId: T,
   callback: ShortcutCallback
@@ -91,7 +90,6 @@ export function useShortcut<T extends AvailableShortcuts>(
     }
 
     // Execute the callback
-    console.log(`Executing callback for shortcut: ${String(shortcutId)}`);
     try {
       callbackRef.current(keyboardEvent);
     } catch (error) {
@@ -122,12 +120,10 @@ export function useShortcut<T extends AvailableShortcuts>(
       }
       
       // Add the event listener
-      console.log(`Adding direct event listener for shortcut: ${String(shortcutId)}`);
       target.addEventListener('keydown', keyboardHandler);
       
       // Return cleanup function
       return () => {
-        console.log(`Removing direct event listener for shortcut: ${String(shortcutId)}`);
         target.removeEventListener('keydown', keyboardHandler);
       };
     } catch (error) {
