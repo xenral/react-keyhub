@@ -233,6 +233,10 @@ export class EventBus {
     const shortcut = this.shortcuts[shortcutId];
 
     if (!shortcut) {
+      // Only log in test environment
+      if (process.env.NODE_ENV === 'test') {
+        console.warn(`Shortcut "${shortcutId}" is not defined`);
+      }
       return '';
     }
 
@@ -439,6 +443,10 @@ export class EventBus {
    */
   public updateShortcut(shortcutId: string, config: Partial<ShortcutConfig>): void {
     if (!this.shortcuts[shortcutId]) {
+      // Only log in test environment
+      if (process.env.NODE_ENV === 'test') {
+        console.warn(`Shortcut "${shortcutId}" is not defined`);
+      }
       return;
     }
 

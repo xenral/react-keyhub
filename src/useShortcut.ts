@@ -114,6 +114,10 @@ export function useShortcut<T extends AvailableShortcuts>(
       isRegisteredRef.current = shortcutId in shortcuts;
 
       if (!isRegisteredRef.current) {
+        // Only log in test environment
+        if (process.env.NODE_ENV === 'test') {
+          console.warn(`Shortcut "${String(shortcutId)}" is not registered. Available shortcuts: ${Object.keys(shortcuts).join(', ')}`);
+        }
         return;
       }
       
@@ -142,6 +146,10 @@ export function getRegisteredShortcuts(): ShortcutSettings {
     const shortcuts = useKeyHubShortcuts();
     return shortcuts;
   } catch (error) {
+    // Only log in test environment
+    if (process.env.NODE_ENV === 'test') {
+      console.warn('Unable to get registered shortcuts:', error);
+    }
     return {};
   }
 } 
